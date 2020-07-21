@@ -1,7 +1,0 @@
-{
-"name" : "Sync Device",
-"versions" : [22,23],
-"file_paths": ["/root/RASTA/examples/bpa_workflow/Sync_Device.bpmn","/root/RASTA/examples/bpa_workflow/Sync_Device.bpmn"],
-"groups": ["svcacct","device-manager","admin","service-manager","workflow-admin"],
-"permissions": ["delete","read","start","stop","resume","pause"]
-}

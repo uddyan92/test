@@ -1,2 +1,0 @@
-http://selenium:4444/wd/hub
-b913d93e2c6e0badf2f800a1e2bbb2c2
