@@ -1,0 +1,13 @@
+
+testbed:
+
+devices:
+   bpa:
+    type: '' 
+    connections:
+      rest:
+        protocol: https
+        ip: 10.105.217.205
+        port: 
+        username: admin
+        password: admin

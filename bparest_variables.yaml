@@ -1,0 +1,622 @@
+# Form Builder Details
+formbuilder:
+    update_form:
+        name: 'testing_new'
+        url: 'api/v1.0/form-builder/form/{name}'
+        data:
+            dataTypeSettings: false
+            enableImport: true
+            formSchema:
+                nodeType: 'service'
+                label: 'test:test'
+                service-point: '/test:test'
+                sort_order: 0
+                isCustomElement: false
+
+    list_all:
+        params:
+            search: ''
+            page: '-1'
+            limit: ''
+            sort: ''
+            startedAfter: ''
+            startedBefore: ''
+        url : 'api/v1.0/form-builder/forms'
+
+    clone:
+        data:
+            source_form: 'Test1'
+            target_form: 'Test1-clone'
+        url: 'api/v1.0/form-builder/form/clone'
+
+    clone_negative:
+        data:
+            source_form: 'Test1'
+            target_form: 'Test1-clone'
+        url: 'api/v1.0/form-builder/form/clone'
+
+    delete_single:
+        name: 'Test1-clone'
+        url: 'api/v1.0/form-builder/form/{name}'
+
+    delete_multiple:
+        url: 'api/v1.0/form-builder/forms'
+        data: ["IOSSwitchPortForm", "test_api_12"]
+
+    retrieve_form:
+        url: 'api/v1.0/form-builder/form/{name}'
+        name: 'testing_new'
+
+    post_form_data:
+        url: 'api/v1.0/form-builder/form'
+        data: {"service":null, "name":"test_api_12", "nso_instance":null, "formType": "Generic Form"}
+
+    import_form:
+        url: 'api/v1.0/form-builder/form/import'
+        files: 'json/formBuilderFormsCollection.json'
+        name: "IOSSwitchPortForm"
+
+# Service Center Details
+servicecenter:
+    all_service:
+        params:
+            nsoInstance: 'NSO-1'
+            servicePoint: '/bpa-service:bpa-service'
+        url: 'api/v1.0/service-manager/service/instances'
+
+    all_service_schemas:
+        params:
+            nsoInstance: 'NSO-1'
+            servicePoint: '/bpa-service:bpa-service'
+        url: 'api/v1.0/service-manager/service/schema'
+
+    add:
+       params:
+             servicePoint: '/bpa-service:bpa-service'
+             nsoInstance: 'NSO-1'
+       data: {"create": [{"bpa-service:bpa-service": [{"name": "device21"}]}], "delete": []}
+       url: 'api/v1.0/service-manager/service'
+       name: 'device1'
+    commit_dryrun:
+       params:
+             outformat: 'cli'
+             nsoInstance: 'NSO-1'
+       data: {"create": [{ "bpa-service:bpa-service": [{"name": "device2"}] }],"delete": []}
+       url: 'api/v1.0/service-manager/service/commit-dry-run'
+
+    leafRefs:
+       params:
+         queryMode: ''
+         servicePoint: '/bpa-service:bpa-service'
+         nsoInstance: 'NSO-1'
+         path: '/device'
+       url : 'api/v1.0/service-manager/service/leaf-refs'
+
+    all_service_points_nsoInstance:
+        params:
+            nsoInstance: 'NSO-1'
+        url: 'api/v1.0/service-manager/services'
+
+    all_service_instances:
+        params:
+            nsoInstance: 'NSO-1'
+            servicePoint: '/bpa-service:bpa-service'
+        url: 'api/v1.0/service-manager/service/instances'
+
+    default_values_service_instance:
+        params:
+            nsoInstance: 'NSO-1'
+            servicePoint: '/bpa-service:bpa-service'
+        url: 'api/v1.0/service-manager/service/default-data'
+
+    sync_all_services:
+        params:
+            nsoInstance: 'NSO-1'
+        url: 'api/v1.0/service-manager/services/sync-schema'
+
+    retrieve_evaluated_service_schema:
+        params:
+            path: '/'
+            servicePoint: '/bpa-service:bpa-service'
+        url: 'api/v1.0/service-manager/service/evaluatedSchema'
+
+    retrieve_evaluated_service_schema_whenTarget:
+        params:
+            path: '/'
+            nsoInstance: 'NSO-1'
+            serviceInstance: '/bpa-service:bpa-service'
+        url: 'api/v1.0/service-manager/service/whenTarget'
+
+    execute_bulk_payload_commit:
+        params:
+            nsoInstance: 'NSO-1'
+        url: 'api/v1.0/service-manager/service'
+        data: {"create": [{"bpa-service:bpa-service": [{"name": "device21"}]}], "delete": [ { "bpa-service:bpa-service": [ { "name": "device25", "path": "/bpa-service:bpa-service{add_bulk}", "whenStatement": false, "ids": 0 } ] } ]}
+
+# workflow  details
+workflow:
+    create_workflow:
+        url: 'engine-rest/deployment/create'
+        files: 'json/ios_switch_port.bpmn'
+
+    setup_permissions_group:
+        params:
+        url: 'api/v1.0/permission/map/group'
+        data: {"resources": [{"id": "82e11547-3ce4-41d5-86fb-756f6341878d",     "permissions": ["9f34a251-f42c-476e-849d-fd3ab008c358","5b5ebc24-5672-4901-a827-042a247352ba","0a8014be-d0fb-4a0b-a8a3-51d0c13b881e","c8a30e77-a3a7-4adb-a0f7-d4e1a1c51e49","b4f25a83-7518-488e-8245-f8bd9e7def52",   "b14a11b9-02f0-4b4f-9e03-34309f16ceb9","0b788ff6-7184-49b3-ba99-742256273c75"]}],"groups": ["5ca80f9e-3939-4d72-a654-18499938512e"]}
+
+    get_activity_instance_count:
+        params:
+            processInstanceId: 'b6a9dda3-2eb3-11e9-8a1d-0242ac160009'
+            Finished: ''
+        url: 'api/v1.0/workflow/history/activity-instances/count'
+
+    get_all_workflow_active_instances:
+        params:
+            processInstanceId: 'b6a9dda3-2eb3-11e9-8a1d-0242ac160009'
+            sortBy: 'startTime'
+            sortOrder: 'desc'
+            firstResult: 0
+            maxResults: 20
+        url: 'api/v1.0/workflow/history/activity-instances'
+
+    create_process_instance_history:
+        url: 'api/v1.0/workflow/history/process-instances/get'
+        data: {"unfinished": true}
+
+    create_instance_variable_history:
+        url: 'api/v1.0/workflow/history/variable-instance'
+        data :
+            processInstanceId : '4623e583-a233-11e9-abbe-0242ac15000c'
+
+    get_list_of_variables_each_workflow:
+        params:
+            processInstanceId: '4eaa7ac2-a6d9-11e9-abbe-0242ac15000c'
+            variableInstanceId: ''
+            variableUpdates': ''
+        url: 'api/v1.0/workflow/history/details'
+
+    get_workflow_incident_count:
+        url: 'api/v1.0/workflow/incident/count'
+
+    get_list_of_process_definitions:
+        url: 'api/v1.0/workflow/process-definition-resource'
+
+    delete_workflow_by_ID:
+        url: 'api/v1.0/workflow/process-definition/{id}'
+        id: 'aabb:1:f8e6a4dc-ebba-11e9-b0e6-0242ac150009'
+
+    submit_workflow_process_definition_form_by_id:
+        url: 'api/v1.0/workflow/process-definition/{id}/submit-form'
+        id: 'IOS_SwitchPort:10:fcc1e469-c868-11e9-a975-0242ac150009'
+
+    get_the_process_instance_count:
+        url: 'api/v1.0/workflow/process-instances/count'
+        params:
+            processInstanceId: '03b89bd6-b1c3-11e9-abbe-0242ac15000c'
+
+    get_list_all_workflow_instances:
+        params:
+            processDefinitionId: 'base-migration:1:79bd24da-9eec-11e9-abbe-0242ac15000c'
+        url: 'api/v1.0/workflow/process-instances'
+
+    delete_process_instance_by_instanceID:
+        url: 'api/v1.0/workflow/process-instance/{id}'
+        id: '0f80e429-c92c-11e9-a975-0242ac150009'
+
+    update_suspended_workflowprocessinstance_instanceID:
+        params:
+        data:
+           suspended: 'true'
+        url: 'api/v1.0/workflow/process-instance/{id}/suspended'
+        id: '1ed12465-a14c-11e9-abbe-0242ac15000c'
+
+    get_workflow_task_count:
+        url: 'api/v1.0/workflow/task/count'
+
+    get_all_workflow_details:
+        url: 'api/v1.0/workflow/tasks'
+
+    claim_workflow_instance_task:
+        params:
+        url: 'api/v1.0/workflow/task/{id}/claim'
+        id: 'fe786768-d052-11e9-a975-0242ac150009'
+        data:
+            userId: "admin"
+
+    get_list_of_all_assigned_tasks:
+        params:
+            assignee: 'admin'
+        url: 'api/v1.0/workflow/tasks'
+
+    process_instance_history_migration:
+        data: {"processInstanceId":"2b58d6c4-a954-11e9-abbe-0242ac15000c"}
+        url : 'api/v1.0/workflow/history/process-instance/migration'
+
+    get_list_of_all_defined_workflow:
+        url: 'api/v1.0/workflow/process-definition/draft'
+
+    delete_workflow_draft_by_id:
+        url: 'api/v1.0/workflow/process-definition/draft/{id}'
+        id: '5d9fc8d4a3537b2ad99e94b4'
+
+    get_single_worlflow_details:
+        url: 'api/v1.0/workflow/process-definition/draft'
+        processDefinitionId: 'IOS_SwitchPort:24:546cdaac-a54f-11e9-abbe-0242ac15000c'
+
+    update_workflow_by_id:
+        url: 'api/v1.0/workflow/process-definition/draft/{id}'
+        id : '5d6f3b404930b22ad0c3b8c0'
+        data: {"name": "update_api_test","key": "update_api_test","xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<bpmn:definitions xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:bpmn=\"http://www.omg.org/spec/BPMN/20100524/MODEL\" xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\" id=\"Definitions_1\" targetNamespace=\"http://bpmn.io/schema/bpmn\" exporter=\"Camunda Modeler\" exporterVersion=\"2.0.0\"><bpmn:process id=\"update_api_test\" name=\"update_api_test\" isExecutable=\"true\" /><bpmndi:BPMNDiagram id=\"BPMNDiagram_1\"><bpmndi:BPMNPlane id=\"BPMNPlane_1\" bpmnElement=\"update_api_test\" /></bpmndi:BPMNDiagram></bpmn:definitions>","resource": "update_api_test.bpmn","username": "admin"}
+
+    create_workflow_draft:
+        url : 'api/v1.0/workflow/process-definition/draft'
+        data: {"name": "testing_api3","key": "test3","xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<bpmn:definitions xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:bpmn=\"http://www.omg.org/spec/BPMN/20100524/MODEL\" xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\" xmlns:camunda=\"http://camunda.org/schema/1.0/bpmn\" id=\"Definitions_1\" targetNamespace=\"http://bpmn.io/schema/bpmn\" exporter=\"Camunda Modeler\" exporterVersion=\"2.0.0\"><bpmn:process id=\"test\" name=\"testing_api1\" isExecutable=\"true\" camunda:versionTag=\"1.2\" /><bpmndi:BPMNDiagram id=\"BPMNDiagram_1\"><bpmndi:BPMNPlane id=\"BPMNPlane_1\" bpmnElement=\"test1\" /></bpmndi:BPMNDiagram></bpmn:definitions>","resource": "test1.bpmn"}
+    gets_form_variables:
+        url: 'api/v1.0/workflow/process-definition/{id}/form-variables'
+        id: 'base-migration:1:79bd24da-9eec-11e9-abbe-0242ac15000c'
+
+    gets_process_template:
+        url: 'api/v1.0/workflow/process-definition/{id}'
+        id: 'complianceCheck:1:223f0d7c-c56f-11e9-a975-0242ac150009'
+
+    gets_xml_data:
+        url: 'api/v1.0/workflow/process-definition/{id}/xml'
+        id: 'IOS_SwitchPort:6:746e3acb-c85f-11e9-a975-0242ac150009'
+
+    restart_workflow:
+        url: 'api/v1.0/workflow/process-definition/{id}/restart'
+        id: 'port-migration:1:23a24719-c56f-11e9-a975-0242ac150009'
+        data: { "initialVariables": false,"skipCustomListeners": true, "withoutBusinessKey": true,"skipIoMappings": false,"instructions": [{"type": "startBeforeActivity","activityId": "serviceInputForm"}],"processInstanceIds":["2c4fd47e-ac93-11e9-abbe-0242ac15000c"]}
+
+    get_all_process_instance_count:
+        url: 'api/v1.0/workflow/process-instance/count'
+
+    get_all_workflow_definitions:
+        url: 'api/v1.0/workflow/process-definitions'
+
+    get_element_template_details:
+        url: 'api/v1.0/workflow/settings'
+
+    get_default_form_object_for_forms:
+        url: 'api/v1.0/workflow/task/{id}/form'
+        id: 'f2e9b110-ac60-11e9-abbe-0242ac15000c'
+
+    get_default_data_for_forms:
+        url: 'api/v1.0/workflow/task/{id}/form-variables'
+        id: '26709ea7-b4d1-11e9-abbe-0242ac15000c'
+
+    get_workflow_instance_task:
+        url: 'api/v1.0/workflow/task/{id}'
+        id: '08f835d5-c928-11e9-a975-0242ac150009'
+
+    unclaims_workflow_instance_task:
+        url: 'api/v1.0/workflow/task/{id}/unclaim'
+        id: 'fe786768-d052-11e9-a975-0242ac150009'
+
+    variables_corresponding_to_workflow_task:
+        url: 'api/v1.0/workflow/task/{id}/variables'
+        id: '26709ea7-b4d1-11e9-abbe-0242ac15000c'
+
+    submit_workflow_process_definition_form_by_key:
+        url: 'api/v1.0/workflow/process-definition/{key}/start'
+        key: 'port-migration'
+        data: {"key": "port-migration"}
+
+    list_of_unassigned_tasks:
+        url: 'api/v1.0/workflow/tasks'
+        params:
+            unassigned: 'true'
+
+    complete_workflow_instance_task:
+        url: 'api/v1.0/workflow/task/{id}/complete'
+        id: '08efd14e-c928-11e9-a975-0242ac150009'
+        data: {"variables": {"formData": {"value": "{\"create\":[{\"ServiceProvWorkflowParams\":[{}]}],\"delete\":[]}"}}}
+
+    submit_workflow_instance_form:
+        url: 'api/v1.0/workflow/task/{id}/submit-form'
+        id: 'f63f436e-b4fc-11e9-abbe-0242ac15000c'
+        data: {"variables": {"formData": {"value": "{\"create\":[{\"ServiceProvWorkflowParams\":[{}]}],\"delete\":[]}"}}}
+
+    create_element_templates:
+        url: 'api/v1.0/workflow/settings'
+        files: 'json/default.json'
+
+# device manager details
+DeviceManager:
+    get_authGroups:
+        params:
+            limit: '20'
+            page: '1'
+            search: ''
+            sort: ''
+            nsoInstance: 'NSO-1'
+        url: 'api/v1.0/device-manager/auth-groups'
+    delete_authgroup:
+        name: 'delete_auth'
+        params:
+            nsoInstance: 'NSO-1'
+        url: 'api/v1.0/device-manager/auth-group/{name}'
+
+    update_auth_group_by_name:
+        name: 'BPAauthgroup'
+        params:
+            nsoInstance: 'NSO-1'
+        data: { "remote-name": "default", "remote-auth": "admin", "remote-password": "remote-password", "remote-secondary-password": "123456789"}
+        url: 'api/v1.0/device-manager/auth-group/{name}'
+    get_user_map:
+        name: 'cisco'
+        params:
+            nsoInstance: 'NSO-1'
+        url: 'api/v1.0/device-manager/auth-group/{name}/umaps'
+    auth_Group_by_NSO:
+        params:
+              nsoInstance: 'NSO-1'
+        data : { "name": "BPAauthgroup", "remote-name": "admin","remote-password": "remote-password" }
+        url : 'api/v1.0/device-manager/auth-groups'
+    execute_connect:
+        params:
+            nsoInstance: 'NSO-1'
+        data : [{"name": "device1"}]
+        url : 'api/v1.0/device-manager/devices/connect'
+    get_device_configuration:
+        params:
+              nsoInstance: 'NSO-1'
+        data : [{ "name": "cisco"}]
+        url : 'api/v1.0/device-manager/devices/getDeviceConfig'
+    get_Devices_list:
+        params:
+            limit: '50'
+            page: '1'
+            search: ''
+            sort: ''
+            nsoInstance: 'NSO-1'
+        url: 'api/v1.0/device-manager/devices'
+    create_device:
+        params:
+            nsoInstance: 'NSO-1'
+            action: 'add'
+        data: [{"address": "127.0.0.1","admin-state": "unlocked","authgroup": "default","description": "testing","latitude": "","longitude": "","device-type": "netconf","name": "Test1234","ned-id": "netconf","port": "444","protocol": ""
+}]
+        url: 'api/v1.0/device-manager/devices'
+
+    get_all_group_details:
+        params:
+            limit: '50'
+            page: '1'
+            search: ''
+            sort: ''
+            nsoInstance: 'NSO-1'
+        url: 'api/v1.0/device-manager/device-groups'
+    delete_group_by_name:
+        name: 'device_group_del'
+        params:
+            nsoInstance: 'NSO-1'
+        url: 'api/v1.0/device-manager/device-group/{name}'
+    update_groups_by_name:
+        name: 'DEV'
+        params:
+            nsoInstance: 'NSO-1'
+        data : {"device-name": ["Test1234"],"device-group": ["Dev"]}
+        url : 'api/v1.0/device-manager/device-group/{name}'
+    create_new_device_group:
+        params:
+            nsoInstance: 'NSO-1'
+        data:  { "name": "testing_124", "device-name": ["d1"], "device-group": ["Dev"]}
+        url: 'api/v1.0/device-manager/device-groups'
+    import_devices_file:
+        params:
+            nsoInstance: 'NSO-1'
+        data:  'filepath'
+        files: 'json/device.csv'
+        url: 'api/v1.0/device-manager/devices/import'
+    gets_list_of_the_device_from_all_controllers:
+        name: 'device_1'
+        url: 'api/v2.0/device-manager/device/{name}/'
+    gets_list_of_all_devices_from_all_controllers:
+        url: 'api/v2.0/device-manager/devices'
+    deletes_multiple_devices_from_nso:
+        params:
+            nsoInstance: 'NSO-1'
+        data: [{'name': 'testing_cisco123'}, {'name': 'Mail_test'}]
+        url: 'api/v2.0/device-manager/devices/delete'
+    gets_all_controller_names:
+        devicename: 'device_6'
+        url: '/api/v1.0/device-manager/device/{devicename}/controllers'
+    deletes_device_from_default_controllers:
+        name: 'del'
+        url: '/api/v2.0/device-manager/device/{name}'
+
+    execute_an_opertion:
+        action: 'ping'
+        params:
+            nsoInstance: 'NSO-1'
+        data: [{'name': 'ABCcc'}]
+        url: 'api/v2.0/device-manager/devices/{action}'
+    import_devices_using_json:
+        params:
+            nsoInstance: 'NSO-1'
+            action: 'add'
+        data: [{"address": "1.1.1.9","admin-state": "unlocked","authgroup": "default","description": "","latitude": "","longitude": "","device-type": "cli","name": "aa20","ned-id": "cisco-ios","port": "1212","protocol": "ssh"},{"address": "1.1.2.2","admin-state": "unlocked","authgroup": "default","description": "","latitude": "","longitude": "","device-type": "cli","name": "aa21","ned-id": "cisco-ios","port": "1313","protocol": "ssh"},{"address": "1.1.3.3","admin-state": "unlocked","authgroup": "default","description": "","latitude": "","longitude": "","device-type": "cli","name": "aa22","ned-id": "cisco-ios","port": "1414","protocol": "ssh"}]
+        url: 'api/v2.0/device-manager/devices/import'
+    device_config_paths:
+        params:
+            nsoInstance: 'NSO-1'
+        data: {'device': 'ABCcc'}
+        url: 'api/v1.0/device-manager/template/deviceconfigpaths'
+    gets_controller_details_for_multiple_devices:
+        data: {'devicenames': ['ABCcc']}
+        url: 'api/v1.0/device-manager/devices/controllers'
+
+# Process template details
+processTemplate:
+    get_list_based_on_template_ids:
+        url: 'api/v1.0/template-manager/process-templates'
+        params:
+            limit: ''
+            page: 1
+            search: ''
+            sort: ''
+            startedAfter: ''
+            startedBefore : ''
+
+    get_list_by_id:
+        url: 'api/v1.0/template-manager/execution/{id}'
+        id: '5d2716ae8f215027e3f105b4'
+        params:
+            index: ''
+            short: 'true'
+
+    # No ADD button in diff tab found
+    add_analytics_difference:
+        url: 'diff'
+        data: {"firstExecutionId": "5ca508a3d35fad1af4b85660", "secondExecutionId": "5ca50b33d35fad1af4b85662", "analyticsTmplId": "analytics4"}
+
+    pass_new_parameters_by_analytics:
+        url: 'api/v1.0/template-manager/analytics'
+        params:
+            page: 1
+            limit: 5000
+            search: ''
+            sort: ''
+            startedAfter: ''
+            startedBefore: ''
+
+    execute_commands_in_processtemplate:
+        data: {"deviceName":"device3","templateId":"DONOT DELETE 1","commandList":[{"command":"show ip interface","isConfigMode":false,"goToStepOnPass":"","goToStepOnFail":"","passExpr":"","rules":[]}]}
+        url: 'api/v1.0/template-manager/execute'
+        params:
+            nsoInstance: 'NSO'
+
+    delete_analytics:
+        id: '5d2c9b75cf2a4b27e9bb2fa3'
+        url: 'api/v1.0/template-manager/analytics/{id}'
+    delete_templates:
+        id: '5d2c9b3617eb2927ea8ae33b'
+        url: 'api/v1.0/template-manager/process-template/{id}'
+    update_template:
+        data: {"_id":"5d281b318f215027e3f105c3","name":"new_temp_test_112","passExpr":"","description":"temp___description__modified","commands":[{"command":"show ip interface","isConfigMode":false,"goToStepOnPass":"","goToStepOnFail":"","passExpr":"","rules":[]}]}
+        url: 'api/v1.0/template-manager/process-template/{id}'
+        id: '5d281b318f215027e3f105c3'
+
+    execute_analytics:
+        url: 'api/v1.0/template-manager/executions'
+        params:
+            page: 1
+            limit: ''
+            search: ''
+            sort: ''
+            startedAfter: ''
+            startedBefore: ''
+
+    add_process_template_by_NSO:
+        url: 'api/v1.0/template-manager/process-template'
+        data: {"name":"new_temp_test_666","passExpr":"","description":"temp","commands":[{"command":"show ip interface","isConfigMode":false,"goToStepOnPass":"","goToStepOnFail":"","passExpr":"","rules":[]}]}
+        params:
+            limit: ''
+            page: ''
+            search: ''
+            sort: ''
+            startedAfter: ''
+            startedBefore : ''
+
+# GoldenConfig Templates details
+goldenConfigTemplates:
+    get_all_golden_config_template_list:
+        url: 'api/v1.0/golden-config/templates'
+    get_details_of_specific_template_by_Record_id:
+        id : '5d26e439c5d6e627dd5678c5'
+        url: 'api/v1.0/golden-config/template/{id}'
+    check_if_template_with_same_name_exists:
+        url: 'api/v1.0/golden-config/template/exist'
+        data: {"name": "test_api_add_new6","version": "3.3","action": "create"}
+    add_template_for_device:
+        url: 'api/v1.0/device-manager/templates'
+        data: {"commands" : "hostname cisco","ned_id" : "cisco-ios"}
+        params:
+            nsoInstance: 'NSO'
+    commit_dry_run:
+        url: 'api/v1.0/golden-config/templates/commit/dry-run'
+        data: {"devices": ["device1"], "templateName": "testingv2.1.1", "variables": {}, "version": "1.2", "outformat" : "native", "type" : "gct_template"}
+        params:
+            nsoInstance: 'NSO'
+    add_new_golden_config_template:
+        url: 'api/v1.0/golden-config/template'
+        data: [{"name": "testing_new_version1", "version": "1.2", "description": "test", "nedid": "cisco-ios","variableProperties": [], "source": "cli_config",
+"commands": "hostname cisco","template_schema": { "config": {"label": "config",
+"nodeType": "container", "hostname": { "label": "hostname","nodeType": "Leaf",
+"prefix": "ios", "data-type": "String", "default": " "}}},"config_template": "<config-template xmlns=\"http://tail-f.com/ns/config/1.0\"><devices xmlns=\"http://tail-f.com/ns/ncs\"><device><name>{$DEVICE}</name><config><hostname xmlns=\"urn:ios\">cisco</hostname></config></device></devices></config-template>", "base_template": "hostname cisco", "configType": " ", "nso": "NSO"}]
+        name: 'testing_new_version1'
+    final_commit_template:
+        url: 'api/v1.0/golden-config/templates/commit/apply'
+        data: {"devices": ["device1"], "templateName": "testingv2.1.1", "variables": {}, "version": "1.2"}
+        params:
+            nsoInstance: 'NSO'
+    compare_two_golden_templates:
+        url: 'api/v1.0/golden-config/templates/compare'
+        data: {"difflabel": "compare1","sourcelabel": "compare2","xml1": "<config-template xmlns='http://tail-f.com/ns/config/1.0'><devices xmlns='http://tail-f.com/ns/ncs'><device><name>{$DEVICE}</name><config><enable xmlns='urn:ios'><password><secret>cisco</secret></password></enable></config></device></devices></config-template>",
+"xml2": "<config-template xmlns='http://tail-f.com/ns/config/1.0'><devices xmlns='http://tail-f.com/ns/ncs'><device><name>{$DEVICE}</name><config><enable xmlns='urn:ios'><password><secret>cisco123</secret></password></enable></config></device></devices></config-template>"}
+
+    update_specific_golden_template:
+        url: 'api/v1.0/golden-config/template/{id}'
+        data: {"nedid": "cisco-ios", "nso": "NSO","commands": "hostname cisco", "base_template": "hostname cisco", "config_template": "<config-template xmlns=\"http://tail-f.com/ns/config/1.0\"><devices xmlns=\"http://tail-f.com/ns/ncs\"><device><name>{$DEVICE}</name><config><hostname xmlns=\"urn:ios\">cisco</hostname></config></device></devices></config-template>", "name": "new file 124",
+"version": "13", "description": "updating check","variableProperties": []}
+        id: '5d25ca17cf2a4b27e9bb2f5b'
+
+    delete_all_golden_templates:
+        url: 'api/v1.0/golden-config/templates'
+        data: ["5d27049b48b00727de65a37a", "5d26e8f8cf2a4b27e9bb2f66"]
+
+# Config Validator
+configValidator:
+    get_list_of_all_NEDs:
+        url: 'api/v1.0/nso-manager/neds'
+
+    execute_NED_validation_command:
+        url: 'api/v1.0/nso-manager/neds/cmd'
+        params: {"nsoInstance": "NSO"}
+        data: {"params":{"commands": "menu cisco clear-screen", "ned_id": "cisco-ios"}}
+
+# Service Topology
+serviceTopology:
+    get_a_list_of_all_directly_modified_services:
+        url: 'api/v1.0/service-manager/service/directly-modified'
+        params:
+            nsoInstance: 'NSO'
+            path: '/test:test{jkjdss}'
+
+    get_all_the_service_points:
+        url: 'svcmgr/service/servicePoint'
+        params:
+            nsoInstance: 'NSO'
+
+    get_all_the_locations_within_the_toplogy:
+        url: 'api/v1.0/topology/locations'
+        params:
+            nsoInstance: 'NSO'
+        data: {"devices": ["device1"]}
+
+    get_all_the_modified_services:
+        url: 'api/v1.0/service-manager/service/modifications'
+        params:
+            nsoInstance: 'NSO'
+            path: '/test:test{jkjdss}'
+
+#Networktopology
+networktopology:
+    get_topology_links:
+#        url: 'api/v1.0/topology/'  # BPA 2.1.1
+        url: 'topology'             # BPA 2.0
+        params:
+            nsoInstance: 'NSO'
+
+    get_list_of_execution_devices:
+        nedId: 'ios-id:cisco-ios'
+        params:
+            nsoInstance: 'NSO'
+        url: 'api/v1.0/device-manager/devices/{nedId}/ned'
+
+    get_topology_by_filter_with_name_and_devices:
+        url: 'api/v1.0/topology/get'
+        params:
+            nsoInstance: 'NSO'
+        data: {devices: ["device1", "cisco57", "device2", "device3"]}

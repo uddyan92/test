@@ -1,0 +1,29 @@
+{
+ "name": "IOSSwitchPortForm",
+ "nso" : "NSO",
+ "service_name" : "/ncs:services/interface-switchport:interface-switchport",
+ "elements": [
+                 {
+                 "action": "configure",
+                 "name": "device-name",
+                 "Info": "device1"
+                 },
+                 {
+                 "action": "configure",
+                 "name": "interface-name",
+                 "Info": "GigabitEthernet"
+                 },
+                 {
+                 "action": "configure",
+                 "name": "port",
+                 "Info": "0/1"
+                 },
+                 {
+                 "action": "configure",
+                 "name": "description",
+                 "Info": "test"
+                 }
+             ]
+}
+
+

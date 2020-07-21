@@ -1,0 +1,28 @@
+[
+  {
+    "name": "test2",
+    "passExpr": "1",
+    "description": "",
+    "status": true,
+    "commands": [
+      {
+        "command": "ls",
+        "goToStepOnPass": "",
+        "goToStepOnFail": "",
+        "passExpr": "",
+        "rules": [
+          {
+            "op": "Contains",
+            "opvariable": "",
+            "desc": "",
+            "isAllTemplates": false,
+            "isAllScripts": false,
+            "rule": "1",
+            "isRegx": false
+          }
+        ],
+        "isConfigMode": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,2012 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0hwmpky" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.1">
+  <bpmn:process id="IOS_SwitchPort" name="Process to change interface switchport description" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Start_Workflow">
+      <bpmn:outgoing>SequenceFlow_0p658cu</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0p658cu" sourceRef="StartEvent_1" targetRef="StartWorkflow" />
+    <bpmn:scriptTask id="StartWorkflow" name="Start Workflow" scriptFormat="JavaScript">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="serviceName">interface-switchport:interface-switchport</camunda:outputParameter>
+          <camunda:outputParameter name="PrePostTemplate">IOS-SwitchPort-Commands</camunda:outputParameter>
+          <camunda:outputParameter name="AnalyticsTemplate">IOS-Switchport-Analytics-Template</camunda:outputParameter>
+          <camunda:outputParameter name="ProjectId">
+            <camunda:script scriptFormat="JavaScript">execution.getProcessInstanceId() + " IOS SwitchPort"</camunda:script>
+          </camunda:outputParameter>
+          <camunda:outputParameter name="InterfaceActionCBPath">/mvp-api/interface-switchport-actions</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0p658cu</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1qypqo6</bpmn:outgoing>
+      <bpmn:script>print(execution.getProcessInstanceId() + " IOS SwitchPort: "+ " Workflow Started");</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="serviceInputForm" name="Service Input" camunda:formKey="CustomForm:RuntimeFormComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="serviceFormName">IOSSwitchPortForm</camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Continue",
+      "key": "continue",
+      "info": "Proceed to next task",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1qypqo6</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1psog7p</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0v2eeva</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1f3zhh4</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0c81m1u</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1e9bdwf</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0u4ewh9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="dryRun" name="Dry Run">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/svcmgr/service/cdr?outformat=native</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Connection">keep-alive</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var formData = execution.getVariable('serviceInputFormData');
+var deviceName = execution.getVariable("deviceName");
+print(projectId+": Running dry-run on device: "+deviceName);
+print(projectId+": dry-run task input payload : "+formData);
+{{formData}}</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="DryRunResp">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var dryRunResp = S(response);
+print(projectId+": Dry run response : "+dryRunResp);
+response;</camunda:script>
+            </camunda:outputParameter>
+            <camunda:outputParameter name="dryRunStatusCode">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var statusCode = connector.getVariable("statusCode");
+print(projectId+": Dry-run Resp status code: "+statusCode);
+statusCode;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1pr28fs</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1yspfps</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0x48vrw</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_19j4dhs</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="ProcessInput" name="Process Service Input" scriptFormat="JavaScript">
+      <bpmn:incoming>SequenceFlow_1eq3sh8</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1q0tiw1</bpmn:outgoing>
+      <bpmn:script>var projectId = execution.getVariable('ProjectId');
+print(projectId+": processing service input ...");
+
+var formData = execution.getVariable('formData');
+execution.setVariable("serviceInputFormData",formData);
+var spinJson = S(formData);
+print(projectId+": form data: "+spinJson);
+
+var serviceName = execution.getVariable('serviceName');
+print(projectId+": service name: "+serviceName);
+
+var obj = spinJson.prop("create").elements().get(0).prop(serviceName).elements().get(0);
+var deviceName = obj.prop("device-name").stringValue();
+execution.setVariable("deviceName",deviceName);
+print(projectId+": device name: "+deviceName);
+
+var interfaceName = obj.prop("interface-name").stringValue();
+var port = obj.prop("port").stringValue();
+var serviceInstance = deviceName + ' ' + interfaceName + ' ' + port;
+var serviceInstancePath = "/ncs:services/" +serviceName+ "{"+serviceInstance+"}";
+execution.setVariable('serviceInstancePath', serviceInstancePath);</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="viewDryRun" name="View Dry Run Results" camunda:formKey="CustomForm:CommitDryrunComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="dryrunOutput">
+            <camunda:script scriptFormat="JavaScript">{{DryRunResp}}</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Continue",
+      "key": "continue",
+      "info": "Proceed to next task",
+      "sendForm": true
+   },
+   {
+      "label": "Cancel",
+      "key": "cancel",
+      "info": "Stop the workflow",
+      "sendForm": true
+   },
+   {
+      "label": "Update Input Values",
+      "key": "revert",
+      "info": "Update service input values",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0fw9acx</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0ubcejg</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Post_Checks" name="Execute Post Check Commands After Commit">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/exec</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var deviceName = execution.getVariable("deviceName");
+print(projectId+": Running post checks after commit on device: "+deviceName);
+var req = {"deviceName": deviceName,"templateId": execution.getVariable('PrePostTemplate')};
+print(projectId+": post-check task input payload : "+JSON.stringify(req));
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="PostChecksResp">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var postChecksResp = S(response);
+var execId = postChecksResp.prop("executionId").stringValue();
+print(projectId+": Post checks task output execution id : "+execId);
+execId;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0bdl3xr</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1p14ksr</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1p14ksr" sourceRef="Post_Checks" targetRef="Calculate_Diff" />
+    <bpmn:serviceTask id="Calculate_Diff" name="Calculate Pre/Post Checks Diff">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/diff</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+print(projectId+": Calculating diff on pre and post checks output responses... ");
+var req = {"analyticsTmplId": execution.getVariable('AnalyticsTemplate'),"firstExecutionId": execution.getVariable('PreChecksResp'), "secondExecutionId": execution.getVariable('PostChecksResp')};
+print(projectId+": diff task input payload : "+JSON.stringify(req));
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:outputParameter name="DiffResp">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var diffResp = S(response);
+var execId = diffResp.prop("analyticsDiffId").stringValue();
+print(projectId+": Diff task output execution id : "+execId);
+execId;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1p14ksr</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1fn54l2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1fn54l2" sourceRef="Calculate_Diff" targetRef="Pre_Post_Checks_Diff" />
+    <bpmn:userTask id="Pre_Post_Checks_Diff" name="View Pre/Post Checks Diff" camunda:formKey="CustomForm:DiffViewComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="diffId">
+            <camunda:script scriptFormat="JavaScript">{{DiffResp}}</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Rollback",
+      "key": "rollback",
+      "info": "Rollback configurations pushed to device ",
+      "sendForm": true
+   },
+   {
+      "label": "Finish",
+      "key": "finish",
+      "info": "Complete the workflow",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1fn54l2</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0vku9p6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_1thkaez" name="Configurations successfully pushed to device, stopping process">
+      <bpmn:incoming>SequenceFlow_1dktzix</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Commit_Service" name="Commit ">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/svcmgr/service</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Connection">keep-alive</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var formData = execution.getVariable('serviceInputFormData');
+var deviceName = execution.getVariable("deviceName");
+print(projectId+": pushing configurations onto the device: "+deviceName);
+print(projectId+": commit task input payload : "+formData);
+{{formData}}</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="CommitResp">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var commitResp = S(response);
+print(projectId+": Commit response : "+commitResp);
+response;</camunda:script>
+            </camunda:outputParameter>
+            <camunda:outputParameter name="commitStatusCode">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var statusCode = connector.getVariable("statusCode");
+print(projectId+": Commit Resp status code: "+statusCode);
+statusCode;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0h013ha</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1eojejm</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_13859jj" name="Are network changes accepted ?">
+      <bpmn:incoming>SequenceFlow_0vku9p6</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1dktzix</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1v1vatk</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Rollback_Service" name="Rollback Service">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/nso/runAction</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Connection">keep-alive</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+print(projectId+": Doing rollback :");
+var req = {"path": execution.getVariable('serviceInstancePath')+'/un-deploy',"params": {}};
+print(projectId+": Rollback action input payload :"+JSON.stringify(req));
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Rollback_Resp">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var resp = S(response);
+print(projectId+" : rollback response : "+resp);
+var statusCode = 200;
+if(!resp.prop('success')) {
+  statusCode = 500;
+} 
+connector.setVariable('rollbackStatusCode', statusCode);
+response;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_174yz02</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_01z11ma</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0sns07b</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1dktzix" name="Accept" sourceRef="ExclusiveGateway_13859jj" targetRef="EndEvent_1thkaez">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("finish")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1d9gwbs" name="Is dry-run output valid ?">
+      <bpmn:incoming>SequenceFlow_0ubcejg</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0xnpjf3</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0nh4h6l</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0c81m1u</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndEvent_0bnkhwh" name="User rejected dry-run, stopping process">
+      <bpmn:incoming>SequenceFlow_0xnpjf3</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0xnpjf3" name="cancel" sourceRef="ExclusiveGateway_1d9gwbs" targetRef="EndEvent_0bnkhwh">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("cancel")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_18ha0ux" name="is pre-check output valid ?">
+      <bpmn:incoming>SequenceFlow_1q9gril</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1pey0sw</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1psog7p</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0h013ha</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0nh4h6l" name="continue" sourceRef="ExclusiveGateway_1d9gwbs" targetRef="Pre_Checks">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("continue")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Pre_Checks" name="Execute Pre Check Commands Before Commit">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/exec</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var deviceName = execution.getVariable("deviceName");
+print(projectId+": Running pre checks on device before commit: "+deviceName);
+var req = {"deviceName": deviceName,"templateId": execution.getVariable('PrePostTemplate')};
+print(projectId+": pre-check task input payload : "+JSON.stringify(req));
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="PreChecksResp">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var preChecksResp = S(response);
+var execId = preChecksResp.prop("executionId").stringValue();
+print(projectId+": Pre checks task output execution id : "+execId);
+execId;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0nh4h6l</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_07tws04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="View_PreChecks" name="View Pre Check Commands Result" camunda:formKey="CustomForm:OutputViewComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="executionOutputId">
+            <camunda:script scriptFormat="JavaScript">var execId = execution.getVariable('PreChecksResp');
+execId;</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Continue",
+      "key": "continue",
+      "info": "Proceed to next task",
+      "sendForm": true
+   },
+   {
+      "label": "Cancel",
+      "key": "cancel",
+      "info": "Stop the workflow",
+      "sendForm": true
+   },
+   {
+      "label": "Update Input Values",
+      "key": "revert",
+      "info": "Update service input values",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_07tws04</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1q9gril</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1qypqo6" sourceRef="StartWorkflow" targetRef="serviceInputForm" />
+    <bpmn:sequenceFlow id="SequenceFlow_1q0tiw1" sourceRef="ProcessInput" targetRef="Dryrun_Check_Sync" />
+    <bpmn:sequenceFlow id="SequenceFlow_07tws04" sourceRef="Pre_Checks" targetRef="View_PreChecks" />
+    <bpmn:endEvent id="EndEvent_1029vls" name="User rejected pre-checks, stopping process">
+      <bpmn:incoming>SequenceFlow_1pey0sw</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1pey0sw" name="cancel" sourceRef="ExclusiveGateway_18ha0ux" targetRef="EndEvent_1029vls">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("cancel")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1psog7p" name="update input values" sourceRef="ExclusiveGateway_18ha0ux" targetRef="serviceInputForm">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("revert")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0vku9p6" sourceRef="Pre_Post_Checks_Diff" targetRef="ExclusiveGateway_13859jj" />
+    <bpmn:serviceTask id="Pre_Check_Before_Rollback" name="Execute Pre Check Commands Before Rollback">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/exec</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var deviceName = execution.getVariable("deviceName");
+print(projectId+": Running pre checks on device before rollback: "+deviceName);
+var req = {"deviceName": deviceName,"templateId": execution.getVariable('PrePostTemplate')};
+print(projectId+": pre-check task input payload : "+JSON.stringify(req));
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="RollbackPreChecksResp">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var preChecksResp = S(response);
+var execId = preChecksResp.prop("executionId").stringValue();
+print(projectId+": Rollback Pre checks task output execution id : "+execId);
+execId;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1v1vatk</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ydd1fd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="View_Prechecks_Before_Rollback" name="View Rollback Pre Check Commands Result" camunda:formKey="CustomForm:OutputViewComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="executionOutputId">
+            <camunda:script scriptFormat="JavaScript">var execId = execution.getVariable('RollbackPreChecksResp');
+execId;</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Continue",
+      "key": "continue",
+      "info": "Proceed to next task",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1ydd1fd</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_174yz02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_1l4gh4f" name="Configurations successfully rolled back from device, stopping process">
+      <bpmn:incoming>SequenceFlow_13bv9s9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Calculate_Rollback_Diff" name="Calculate Rollback Pre/Post checks Diff">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/diff</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+print(projectId+": Calculating rollback diff on pre and post checks output responses... ");
+var req = {"analyticsTmplId": execution.getVariable('AnalyticsTemplate'),"firstExecutionId": execution.getVariable('RollbackPreChecksResp'), "secondExecutionId": execution.getVariable('RollbackPostChecksResp')};
+print(projectId+": diff task input payload : "+JSON.stringify(req));
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="RollbackDiffResp">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var diffResp = S(response);
+var execId = diffResp.prop("analyticsDiffId").stringValue();
+print(projectId+": Rollback Diff task output execution id : "+execId);
+execId;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0dhzep6</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0j5wm1o</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Rollback_Pre_Post_checks_Diff" name="View Rollback Pre/Post Checks Diff" camunda:formKey="CustomForm:DiffViewComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="diffId">
+            <camunda:script scriptFormat="JavaScript">{{RollbackDiffResp}}</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Finish",
+      "key": "finish",
+      "info": "Complete the workflow",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0j5wm1o</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_13bv9s9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0nw1f7f" name="Is Commit Successful?">
+      <bpmn:incoming>SequenceFlow_1eojejm</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0bdl3xr</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_032fkb6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1eojejm" sourceRef="Commit_Service" targetRef="ExclusiveGateway_0nw1f7f" />
+    <bpmn:sequenceFlow id="SequenceFlow_0bdl3xr" name="Yes" sourceRef="ExclusiveGateway_0nw1f7f" targetRef="Post_Checks">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${commitStatusCode == 200}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_032fkb6" name="No" sourceRef="ExclusiveGateway_0nw1f7f" targetRef="View_Commit_Errors">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${commitStatusCode != 200}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="View_Commit_Errors" name="View Commit Errors" camunda:formKey="CustomForm:ValidationErrorComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">
+            <camunda:script scriptFormat="JavaScript">var error = {
+    "code": "1006",
+    "message": "MVP: commit error",
+    "details": execution.getVariable('CommitResp')
+}
+JSON.stringify(error);</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Cancel",
+      "key": "cancel",
+      "info": "Stop the workflow",
+      "sendForm": true
+   },
+   {
+      "label": "Update Input Values",
+      "key": "revert",
+      "info": "Update service input values",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_032fkb6</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ss5yzm</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0n8pgsu" name="Is Rollback Successful?">
+      <bpmn:incoming>SequenceFlow_0sns07b</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1j1fhw8</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0utr8xl</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="View_Rollback_Errors" name="View Rollback Errors" camunda:formKey="CustomForm:ValidationErrorComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">
+            <camunda:script scriptFormat="JavaScript">var error = {
+    "code": "1007",
+    "message": "MVP: rollback error",
+    "details": execution.getVariable('Rollback_Resp')
+}
+JSON.stringify(error);</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Cancel",
+      "key": "cancel",
+      "info": "Stop the workflow",
+      "sendForm": true
+   },
+   {
+      "label": "Retry",
+      "key": "retry",
+      "info": "Retry rollback action",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1j1fhw8</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0eazq76</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_187sgxz" name="Is dry-run successful?">
+      <bpmn:incoming>SequenceFlow_19j4dhs</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0fw9acx</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0qftsst</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="View_Dryrun_Errors" name="View Dryrun Errors" camunda:formKey="CustomForm:ValidationErrorComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">
+            <camunda:script scriptFormat="JavaScript">var error = {
+    "code": "1005",
+    "message": "MVP: dry-run error",
+    "details": execution.getVariable('DryRunResp')
+}
+JSON.stringify(error);</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Cancel",
+      "key": "cancel",
+      "info": "Stop the workflow",
+      "sendForm": true
+   },
+   {
+      "label": "Update Input Values",
+      "key": "revert",
+      "info": "Update service input values",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0qftsst</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_12n1sb8</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_19ljx5p" name="input values valid?">
+      <bpmn:incoming>SequenceFlow_0zxtd9j</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_04qxmmw</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1eq3sh8</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0zxtd9j" sourceRef="Validate_Service_Input" targetRef="ExclusiveGateway_19ljx5p" />
+    <bpmn:serviceTask id="Validate_Service_Input" name="Service Input Validation">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/nso/runAction</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Connection">keep-alive</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var formData = execution.getVariable('formData');
+var serviceName = execution.getVariable('serviceName');
+var spinJson = S(formData);
+var inputs = spinJson.prop("create").elements().get(0).prop(serviceName).elements().get(0);
+print(projectId+": validating service input params :"+inputs);
+var req = {"path": execution.getVariable('InterfaceActionCBPath'),"params":JSON.parse(inputs)};
+print(projectId+": service input validation payload :"+JSON.stringify(req));
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="InputValidationResp">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var resp = S(response);
+print(projectId+" : service input validation response : "+resp);
+var statusCode = 200;
+try {
+  if(resp.prop('success')) { statusCode=resp.prop('response').prop('result').elements().get(0).prop('value').value(); 
+  } else {
+    statusCode = 500;
+  }
+} catch (e) {
+  statusCode = 500;
+}
+connector.setVariable('validationsStatusCode', statusCode);
+response;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0u4ewh9</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0zxtd9j</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="View_Validation_Errors" name="View Input Validation Errors" camunda:formKey="CustomForm:ValidationErrorComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">
+            <camunda:script scriptFormat="JavaScript">var error = {
+    "code": "1001",
+    "message": "MVP: validations error",
+    "details": execution.getVariable('InputValidationResp')
+}
+JSON.stringify(error);</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Cancel",
+      "key": "cancel",
+      "info": "Stop the workflow",
+      "sendForm": true
+   },
+   {
+      "label": "Update Input Values",
+      "key": "revert",
+      "info": "Update service input values",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_04qxmmw</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0kdx56t</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0v2eeva" name="No" sourceRef="ExclusiveGateway_0mrww2b" targetRef="serviceInputForm">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("revert")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0mrww2b" name="User cancelled workflow ?">
+      <bpmn:incoming>SequenceFlow_0kdx56t</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_00ey3rj</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0v2eeva</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndEvent_09r2m93" name="User cancelled workflow, as service input values are not valid&#10;">
+      <bpmn:incoming>SequenceFlow_00ey3rj</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_00ey3rj" name="Yes" sourceRef="ExclusiveGateway_0mrww2b" targetRef="EndEvent_09r2m93">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("cancel")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0mh0szk" name="User cancelled workflow ?">
+      <bpmn:incoming>SequenceFlow_12n1sb8</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1qq76by</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1f3zhh4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndEvent_1ko72v2" name="User cancelled workflow, as dry-run failed with errors">
+      <bpmn:incoming>SequenceFlow_1qq76by</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_04qxmmw" name="No" sourceRef="ExclusiveGateway_19ljx5p" targetRef="View_Validation_Errors">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${validationsStatusCode != 200}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1eq3sh8" name="Yes" sourceRef="ExclusiveGateway_19ljx5p" targetRef="ProcessInput">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${validationsStatusCode == 200}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0kdx56t" sourceRef="View_Validation_Errors" targetRef="ExclusiveGateway_0mrww2b" />
+    <bpmn:sequenceFlow id="SequenceFlow_19j4dhs" sourceRef="dryRun" targetRef="ExclusiveGateway_187sgxz" />
+    <bpmn:sequenceFlow id="SequenceFlow_0fw9acx" name="success" sourceRef="ExclusiveGateway_187sgxz" targetRef="viewDryRun">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${dryRunStatusCode == 200}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0qftsst" name="error" sourceRef="ExclusiveGateway_187sgxz" targetRef="View_Dryrun_Errors">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${dryRunStatusCode != 200}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1qq76by" name="Yes" sourceRef="ExclusiveGateway_0mh0szk" targetRef="EndEvent_1ko72v2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("cancel")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1f3zhh4" name="No" sourceRef="ExclusiveGateway_0mh0szk" targetRef="serviceInputForm">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("revert")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0ubcejg" sourceRef="viewDryRun" targetRef="ExclusiveGateway_1d9gwbs" />
+    <bpmn:serviceTask id="Dryrun_Check_Sync" name="Device check-sync">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/devmgr/devices/action/check-sync</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var deviceName = execution.getVariable("deviceName");
+print(projectId+": Running check-sync task before dry-run on device: "+deviceName);
+var req = [{"name": deviceName}];
+print(projectId+": check-sync task input payload: " +JSON.stringify(req));
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:outputParameter name="DryrunCheckSyncResp">
+              <camunda:script scriptFormat="JavaScript">{{response}};</camunda:script>
+            </camunda:outputParameter>
+            <camunda:outputParameter name="DryrunCheckSyncStatus">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var checkSyncResp = S(response);
+print(projectId+": check-sync response: "+checkSyncResp);
+
+var checkSyncStatus = checkSyncResp.elements().get(0).prop("result").elements().get(0).prop("value").stringValue();
+
+print(projectId+": check-sync status: "+checkSyncStatus);
+checkSyncStatus;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0s8jhvl</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_07a5d0g</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1dm8zu2</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1q0tiw1</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_19b82s6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0voqjs7" name="Is device in                 &#10;sync?&#10;">
+      <bpmn:incoming>SequenceFlow_19b82s6</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0wlpto7</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0l8nf74</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1pr28fs</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_19b82s6" sourceRef="Dryrun_Check_Sync" targetRef="ExclusiveGateway_0voqjs7" />
+    <bpmn:sequenceFlow id="SequenceFlow_0wlpto7" name="No" sourceRef="ExclusiveGateway_0voqjs7" targetRef="Dryrun_Device_Compare_Config">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${DryrunCheckSyncStatus == "out-of-sync"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0l8nf74" name="error" sourceRef="ExclusiveGateway_0voqjs7" targetRef="View_DryrunCheckSync_Errors">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${DryrunCheckSyncStatus == "error" || DryrunCheckSyncStatus == "locked"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_17ra7mp" sourceRef="Dryrun_Device_Compare_Config" targetRef="View_Compare_Config_Before_Dryrun" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0dv4rn4" name="sync type ?">
+      <bpmn:incoming>SequenceFlow_1yc6j0c</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1glwlg1</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1byyqt4</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_130rsfb</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1yc6j0c" sourceRef="View_Compare_Config_Before_Dryrun" targetRef="ExclusiveGateway_0dv4rn4" />
+    <bpmn:sequenceFlow id="SequenceFlow_1glwlg1" name="sync-to" sourceRef="ExclusiveGateway_0dv4rn4" targetRef="Sync_To_Before_Dryrun">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("sync-config-to")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1byyqt4" name="sync-from" sourceRef="ExclusiveGateway_0dv4rn4" targetRef="Sync_From_Before_Dryrun">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("sync-config-from")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1lfw7t3" name="is sync-to success?">
+      <bpmn:incoming>SequenceFlow_1m9ho0j</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1g0euep</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1yspfps</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1m9ho0j" sourceRef="Sync_To_Before_Dryrun" targetRef="ExclusiveGateway_1lfw7t3" />
+    <bpmn:sequenceFlow id="SequenceFlow_1g0euep" name="No" sourceRef="ExclusiveGateway_1lfw7t3" targetRef="View_SyncTo_Errors_Before_Dryrun">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${DryrunSyncToStatus != "true"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_06lh7wn" name="is sync-from success?">
+      <bpmn:incoming>SequenceFlow_0c3ikix</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0fmudsd</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0x48vrw</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0c3ikix" sourceRef="Sync_From_Before_Dryrun" targetRef="ExclusiveGateway_06lh7wn" />
+    <bpmn:sequenceFlow id="SequenceFlow_0fmudsd" name="No" sourceRef="ExclusiveGateway_06lh7wn" targetRef="View_SyncFrom_Errors_Before_Dryrun">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${DryrunSyncFromStatus != "true"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0s8jhvl" name="No" sourceRef="ExclusiveGateway_10idpp1" targetRef="Dryrun_Check_Sync">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("continue")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_07a5d0g" name="No" sourceRef="ExclusiveGateway_0d7ma5g" targetRef="Dryrun_Check_Sync">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("continue")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1pr28fs" name="Yes" sourceRef="ExclusiveGateway_0voqjs7" targetRef="dryRun">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${DryrunCheckSyncStatus == "in-sync"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1yspfps" name="Yes" sourceRef="ExclusiveGateway_1lfw7t3" targetRef="dryRun">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${DryrunSyncToStatus == "true"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0x48vrw" name="Yes" sourceRef="ExclusiveGateway_06lh7wn" targetRef="dryRun">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${DryrunSyncFromStatus == "true"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="View_DryrunCheckSync_Errors" name="View CheckSync Errors" camunda:formKey="CustomForm:ValidationErrorComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">
+            <camunda:script scriptFormat="JavaScript">var error = {
+    "code": "1002",
+    "message": "MVP: check-sync error",
+    "details": execution.getVariable('DryrunCheckSyncResp')
+}
+JSON.stringify(error);</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Retry",
+      "key": "retry",
+      "info": "Retry check-sync operation",
+      "sendForm": true
+   },
+   {
+      "label": "Cancel",
+      "key": "cancel",
+      "info": "Stop the workflow",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0l8nf74</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1q2ul0t</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Dryrun_Device_Compare_Config" name="Device Compare Config">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/devmgr/devices/action/compare-config</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var deviceName = execution.getVariable("deviceName");
+print(projectId+": comparing config on device: "+deviceName);
+var payload = JSON.stringify([{
+  "name": deviceName
+}]);
+print(projectId+":  compare config task input payload : "+payload);
+payload;</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="DrCompareConfigResponse">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var compareConfigResp = S(response);
+print(projectId+": Compare Config response : "+compareConfigResp);
+response;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0wlpto7</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_17ra7mp</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="View_Compare_Config_Before_Dryrun" name="View Compare Config Results" camunda:formKey="CustomForm:CompareconfigComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="actionData">
+            <camunda:script scriptFormat="JavaScript">var actionData = {
+name: "Device Compare Config",
+action: "compare"
+};
+JSON.stringify(actionData);</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="devices">
+            <camunda:script scriptFormat="JavaScript">var deviceName = execution.getVariable("deviceName");
+var devices = [
+{
+  name: deviceName
+}
+];
+JSON.stringify(devices);</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="actionResult">
+            <camunda:script scriptFormat="JavaScript">var actionResult = execution.getVariable('DrCompareConfigResponse');
+JSON.stringify(JSON.parse(actionResult));</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "sync-config-to",
+      "key": "sync-config-to",
+      "info": "Sync NSO CDB config to device",
+      "sendForm": true
+   },
+   {
+      "label": "sync-config-from",
+      "key": "sync-config-from",
+      "info": "Sync device config into NSO CDB",
+      "sendForm": true
+   },
+   {
+      "label": "Cancel",
+      "key": "cancel",
+      "info": "Stop the workflow",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_17ra7mp</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1yc6j0c</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Sync_To_Before_Dryrun" name="Device sync-to">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/devmgr/devices/action/sync-to</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var deviceName = execution.getVariable("deviceName");
+print(projectId+": Running sync-to task before dry-run on device: "+deviceName);
+
+var req = [{"name": deviceName}];
+print(projectId+": sync-to task input payload: " +JSON.stringify(req));
+
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:outputParameter name="DryrunSyncToResp">
+              <camunda:script scriptFormat="JavaScript">{{response}};</camunda:script>
+            </camunda:outputParameter>
+            <camunda:outputParameter name="DryrunSyncToStatus">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var syncToResp = S(response);
+print(projectId +": sync-to response: "+syncToResp);
+var syncToStatus = syncToResp.elements().get(0).prop("result").elements().get(0).prop("value").stringValue();
+print(projectId+": sync-to status: "+syncToStatus);
+syncToStatus;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1glwlg1</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1m9ho0j</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="View_SyncTo_Errors_Before_Dryrun" name="View SyncTo Errors" camunda:formKey="CustomForm:ValidationErrorComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">
+            <camunda:script scriptFormat="JavaScript">var error = {
+    "code": "1004",
+    "message": "MVP: sync-to error",
+    "details": execution.getVariable('DryrunSyncToResp')
+}
+JSON.stringify(error);</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Continue",
+      "key": "continue",
+      "info": "Retry check-sync operation",
+      "sendForm": true
+   },
+   {
+      "label": "Cancel",
+      "key": "cancel",
+      "info": "Stop the workflow",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1g0euep</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_094pmox</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Sync_From_Before_Dryrun" name="Device sync-from">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/devmgr/devices/action/sync-from</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var deviceName = execution.getVariable("deviceName");
+print(projectId+": running sync-from task before dry-run on device: "+deviceName);
+
+var req = [{"name": deviceName}];
+print(projectId+": sync-from task input payload: " +JSON.stringify(req));
+
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="DryrunSyncFromResp">
+              <camunda:script scriptFormat="JavaScript">{{response}};</camunda:script>
+            </camunda:outputParameter>
+            <camunda:outputParameter name="DryrunSyncFromStatus">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var syncFromResp = S(response);
+print(projectId +": sync-from response: "+syncFromResp);
+var syncFromStatus = syncFromResp.elements().get(0).prop("result").elements().get(0).prop("value").stringValue();
+print(projectId+": sync-from status: "+syncFromStatus);
+syncFromStatus;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1byyqt4</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0c3ikix</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="View_SyncFrom_Errors_Before_Dryrun" name="View SyncFrom Errors" camunda:formKey="CustomForm:ValidationErrorComponent" camunda:candidateGroups="MVP-Demo">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">
+            <camunda:script scriptFormat="JavaScript">var error = {
+    "code": "1003",
+    "message": "MVP: sync-from error",
+    "details": execution.getVariable('DryrunSyncFromResp')
+}
+JSON.stringify(error);</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="formButtons">{
+   "formButtons" : [
+   {
+      "label": "Continue",
+      "key": "continue",
+      "info": "Retry check-sync operation",
+      "sendForm": true
+   },
+   {
+      "label": "Cancel",
+      "key": "cancel",
+      "info": "Stop the workflow",
+      "sendForm": true
+   }
+   ]
+}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0fmudsd</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_03bpml4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0xk9yn7" name="User cancelled workflow ?">
+      <bpmn:incoming>SequenceFlow_1q2ul0t</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_039tzuq</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1dm8zu2</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1q2ul0t" sourceRef="View_DryrunCheckSync_Errors" targetRef="ExclusiveGateway_0xk9yn7" />
+    <bpmn:endEvent id="EndEvent_090gjk5" name="User cancelled workflow, as device check-sync operation failed">
+      <bpmn:incoming>SequenceFlow_039tzuq</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_039tzuq" name="Yes" sourceRef="ExclusiveGateway_0xk9yn7" targetRef="EndEvent_090gjk5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("cancel")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1dm8zu2" name="retry" sourceRef="ExclusiveGateway_0xk9yn7" targetRef="Dryrun_Check_Sync">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("retry")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_10idpp1" name="User cancelled workflow ?">
+      <bpmn:incoming>SequenceFlow_094pmox</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1cw5jr6</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0s8jhvl</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_094pmox" sourceRef="View_SyncTo_Errors_Before_Dryrun" targetRef="ExclusiveGateway_10idpp1" />
+    <bpmn:endEvent id="EndEvent_0a4dxbf" name="User cancelled workflow, as device sync-to operation failed">
+      <bpmn:incoming>SequenceFlow_1cw5jr6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1cw5jr6" name="Yes" sourceRef="ExclusiveGateway_10idpp1" targetRef="EndEvent_0a4dxbf">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("cancel")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0d7ma5g" name="User cancelled workflow ?">
+      <bpmn:incoming>SequenceFlow_03bpml4</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_00qnw0y</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_07a5d0g</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_03bpml4" sourceRef="View_SyncFrom_Errors_Before_Dryrun" targetRef="ExclusiveGateway_0d7ma5g" />
+    <bpmn:endEvent id="EndEvent_0j3rvh2" name="User cancelled workflow, as device sync-from operation failed">
+      <bpmn:incoming>SequenceFlow_00qnw0y</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_00qnw0y" name="Yes" sourceRef="ExclusiveGateway_0d7ma5g" targetRef="EndEvent_0j3rvh2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("cancel")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="EndEvent_1qgovpz" name="User cancelled workflow at Compare Config task">
+      <bpmn:incoming>SequenceFlow_130rsfb</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_130rsfb" name="cancel" sourceRef="ExclusiveGateway_0dv4rn4" targetRef="EndEvent_1qgovpz">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("cancel")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_12n1sb8" sourceRef="View_Dryrun_Errors" targetRef="ExclusiveGateway_0mh0szk" />
+    <bpmn:sequenceFlow id="SequenceFlow_0h013ha" name="continue" sourceRef="ExclusiveGateway_18ha0ux" targetRef="Commit_Service">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("continue")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1q9gril" sourceRef="View_PreChecks" targetRef="ExclusiveGateway_18ha0ux" />
+    <bpmn:sequenceFlow id="SequenceFlow_0c81m1u" name="update input values" sourceRef="ExclusiveGateway_1d9gwbs" targetRef="serviceInputForm">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("revert")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1v1vatk" name="Rollback" sourceRef="ExclusiveGateway_13859jj" targetRef="Pre_Check_Before_Rollback">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("rollback")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1ydd1fd" sourceRef="Pre_Check_Before_Rollback" targetRef="View_Prechecks_Before_Rollback" />
+    <bpmn:sequenceFlow id="SequenceFlow_174yz02" sourceRef="View_Prechecks_Before_Rollback" targetRef="Rollback_Service" />
+    <bpmn:sequenceFlow id="SequenceFlow_0sns07b" sourceRef="Rollback_Service" targetRef="ExclusiveGateway_0n8pgsu" />
+    <bpmn:sequenceFlow id="SequenceFlow_1j1fhw8" name="No" sourceRef="ExclusiveGateway_0n8pgsu" targetRef="View_Rollback_Errors">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${rollbackStatusCode != 200}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0utr8xl" name="Yes" sourceRef="ExclusiveGateway_0n8pgsu" targetRef="Post_Check_Before_Rollback">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${rollbackStatusCode == 200}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Post_Check_Before_Rollback" name="Execute Post Check Commands After Rollback">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://core-services:9100/exec</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var projectId = execution.getVariable('ProjectId');
+var deviceName = execution.getVariable("deviceName");
+print(projectId+": Running post checks after rollback on device: "+deviceName);
+var req = {"deviceName": deviceName,"templateId": execution.getVariable('PrePostTemplate')};
+print(projectId+": post-check task input payload : "+JSON.stringify(req));
+JSON.stringify(req);</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:outputParameter name="RollbackPostChecksResp">
+              <camunda:script scriptFormat="JavaScript">var projectId = connector.getVariable('ProjectId');
+var postChecksResp = S(response);
+var execId = postChecksResp.prop("executionId").stringValue();
+print(projectId+": Rollback Post checks task output execution id : "+execId);
+execId;</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0utr8xl</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0dhzep6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0dhzep6" sourceRef="Post_Check_Before_Rollback" targetRef="Calculate_Rollback_Diff" />
+    <bpmn:sequenceFlow id="SequenceFlow_0j5wm1o" sourceRef="Calculate_Rollback_Diff" targetRef="Rollback_Pre_Post_checks_Diff" />
+    <bpmn:sequenceFlow id="SequenceFlow_13bv9s9" sourceRef="Rollback_Pre_Post_checks_Diff" targetRef="EndEvent_1l4gh4f" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_19gzlcx">
+      <bpmn:incoming>SequenceFlow_1ss5yzm</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0aut0ct</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1e9bdwf</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1ss5yzm" sourceRef="View_Commit_Errors" targetRef="ExclusiveGateway_19gzlcx" />
+    <bpmn:endEvent id="EndEvent_0fhr3hg" name="User cancelled workflow, as commit operation failed&#10;">
+      <bpmn:incoming>SequenceFlow_0aut0ct</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0aut0ct" name="cancel" sourceRef="ExclusiveGateway_19gzlcx" targetRef="EndEvent_0fhr3hg">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("cancel")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1e9bdwf" name="update input values" sourceRef="ExclusiveGateway_19gzlcx" targetRef="serviceInputForm">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("revert")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1g1fhfm">
+      <bpmn:incoming>SequenceFlow_0eazq76</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_05l258y</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_01z11ma</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0eazq76" sourceRef="View_Rollback_Errors" targetRef="ExclusiveGateway_1g1fhfm" />
+    <bpmn:endEvent id="EndEvent_1tsgl5f" name="User cancelled workflow, as rollback operation failed">
+      <bpmn:incoming>SequenceFlow_05l258y</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_05l258y" name="cancel" sourceRef="ExclusiveGateway_1g1fhfm" targetRef="EndEvent_1tsgl5f">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("cancel")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_01z11ma" name="retry" sourceRef="ExclusiveGateway_1g1fhfm" targetRef="Rollback_Service">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${clickedButtonKey.equals("retry")}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0u4ewh9" sourceRef="serviceInputForm" targetRef="Validate_Service_Input" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IOS_SwitchPort">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="2" y="201" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-17" y="244" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0p658cu_di" bpmnElement="SequenceFlow_0p658cu">
+        <di:waypoint x="38" y="219" />
+        <di:waypoint x="73" y="219" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_1xeezsd_di" bpmnElement="StartWorkflow">
+        <dc:Bounds x="73" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1ia0efg_di" bpmnElement="serviceInputForm">
+        <dc:Bounds x="194" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_06pia42_di" bpmnElement="dryRun">
+        <dc:Bounds x="2568" y="189" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_1w6dtfz_di" bpmnElement="ProcessInput">
+        <dc:Bounds x="609" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1w8wuks_di" bpmnElement="viewDryRun">
+        <dc:Bounds x="2752" y="189" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_098nhl9_di" bpmnElement="Post_Checks">
+        <dc:Bounds x="637" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1p14ksr_di" bpmnElement="SequenceFlow_1p14ksr">
+        <di:waypoint x="737" y="803" />
+        <di:waypoint x="817" y="803" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1c535jk_di" bpmnElement="Calculate_Diff">
+        <dc:Bounds x="817" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1fn54l2_di" bpmnElement="SequenceFlow_1fn54l2">
+        <di:waypoint x="917" y="803" />
+        <di:waypoint x="1001" y="803" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0l72alp_di" bpmnElement="Pre_Post_Checks_Diff">
+        <dc:Bounds x="1001" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1thkaez_di" bpmnElement="EndEvent_1thkaez">
+        <dc:Bounds x="1177" y="925" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1151" y="971" width="87" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0kfnw2j_di" bpmnElement="Commit_Service">
+        <dc:Bounds x="247" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_13859jj_di" bpmnElement="ExclusiveGateway_13859jj" isMarkerVisible="true">
+        <dc:Bounds x="1170" y="778" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1119" y="832" width="90" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1lqc0sa_di" bpmnElement="Rollback_Service">
+        <dc:Bounds x="1573" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1dktzix_di" bpmnElement="SequenceFlow_1dktzix">
+        <di:waypoint x="1195" y="828" />
+        <di:waypoint x="1195" y="925" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1200" y="859" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1d9gwbs_di" bpmnElement="ExclusiveGateway_1d9gwbs" isMarkerVisible="true">
+        <dc:Bounds x="3344" y="81" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3284" y="124" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0bnkhwh_di" bpmnElement="EndEvent_0bnkhwh">
+        <dc:Bounds x="3450" y="88" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3424" y="33" width="88" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0xnpjf3_di" bpmnElement="SequenceFlow_0xnpjf3">
+        <di:waypoint x="3394" y="106" />
+        <di:waypoint x="3450" y="106" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3408" y="85" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_18ha0ux_di" bpmnElement="ExclusiveGateway_18ha0ux" isMarkerVisible="true">
+        <dc:Bounds x="3668" y="81" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3617" y="125" width="66" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0nh4h6l_di" bpmnElement="SequenceFlow_0nh4h6l">
+        <di:waypoint x="3369" y="131" />
+        <di:waypoint x="3369" y="189" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3375" y="136" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1igs7pz_di" bpmnElement="Pre_Checks">
+        <dc:Bounds x="3319" y="189" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_0nj8dk8_di" bpmnElement="View_PreChecks">
+        <dc:Bounds x="3506" y="189" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1qypqo6_di" bpmnElement="SequenceFlow_1qypqo6">
+        <di:waypoint x="173" y="219" />
+        <di:waypoint x="194" y="219" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1q0tiw1_di" bpmnElement="SequenceFlow_1q0tiw1">
+        <di:waypoint x="659" y="259" />
+        <di:waypoint x="659" y="301" />
+        <di:waypoint x="1126" y="301" />
+        <di:waypoint x="1126" y="259" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_07tws04_di" bpmnElement="SequenceFlow_07tws04">
+        <di:waypoint x="3419" y="229" />
+        <di:waypoint x="3506" y="229" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1029vls_di" bpmnElement="EndEvent_1029vls">
+        <dc:Bounds x="3773" y="88" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3749" y="41" width="84" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1pey0sw_di" bpmnElement="SequenceFlow_1pey0sw">
+        <di:waypoint x="3718" y="106" />
+        <di:waypoint x="3773" y="106" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3726" y="107" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1psog7p_di" bpmnElement="SequenceFlow_1psog7p">
+        <di:waypoint x="3693" y="81" />
+        <di:waypoint x="3693" y="-196" />
+        <di:waypoint x="202" y="-196" />
+        <di:waypoint x="202" y="180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3621" y="-22" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0vku9p6_di" bpmnElement="SequenceFlow_0vku9p6">
+        <di:waypoint x="1101" y="803" />
+        <di:waypoint x="1170" y="803" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1w6rflf_di" bpmnElement="Pre_Check_Before_Rollback">
+        <dc:Bounds x="1266" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_06he5pn_di" bpmnElement="View_Prechecks_Before_Rollback">
+        <dc:Bounds x="1414" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1l4gh4f_di" bpmnElement="EndEvent_1l4gh4f">
+        <dc:Bounds x="2369" y="785" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2348" y="828" width="80" height="66" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0glzugr_di" bpmnElement="Calculate_Rollback_Diff">
+        <dc:Bounds x="2046" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1l8782u_di" bpmnElement="Rollback_Pre_Post_checks_Diff">
+        <dc:Bounds x="2202" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0nw1f7f_di" bpmnElement="ExclusiveGateway_0nw1f7f" isMarkerVisible="true">
+        <dc:Bounds x="479" y="661" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="474" y="631" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1eojejm_di" bpmnElement="SequenceFlow_1eojejm">
+        <di:waypoint x="297" y="763" />
+        <di:waypoint x="297" y="686" />
+        <di:waypoint x="479" y="686" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0bdl3xr_di" bpmnElement="SequenceFlow_0bdl3xr">
+        <di:waypoint x="529" y="686" />
+        <di:waypoint x="687" y="686" />
+        <di:waypoint x="687" y="763" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600" y="668" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_032fkb6_di" bpmnElement="SequenceFlow_032fkb6">
+        <di:waypoint x="504" y="711" />
+        <di:waypoint x="504" y="763" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="512" y="737" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_1bjk53a_di" bpmnElement="View_Commit_Errors">
+        <dc:Bounds x="454" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0n8pgsu_di" bpmnElement="ExclusiveGateway_0n8pgsu" isMarkerVisible="true">
+        <dc:Bounds x="1760" y="661" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1756" y="631" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_0ukzydw_di" bpmnElement="View_Rollback_Errors">
+        <dc:Bounds x="1735" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_187sgxz_di" bpmnElement="ExclusiveGateway_187sgxz" isMarkerVisible="true">
+        <dc:Bounds x="2777" y="81" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2739" y="64" width="58" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_0zm99xi_di" bpmnElement="View_Dryrun_Errors">
+        <dc:Bounds x="2910" y="189" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_19ljx5p_di" bpmnElement="ExclusiveGateway_19ljx5p" isMarkerVisible="true">
+        <dc:Bounds x="634" y="81" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="629" y="43.5" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0zxtd9j_di" bpmnElement="SequenceFlow_0zxtd9j">
+        <di:waypoint x="433" y="179" />
+        <di:waypoint x="433" y="106" />
+        <di:waypoint x="634" y="106" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0ruvh1p_di" bpmnElement="Validate_Service_Input">
+        <dc:Bounds x="383" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_0u6o3qm_di" bpmnElement="View_Validation_Errors">
+        <dc:Bounds x="826" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0v2eeva_di" bpmnElement="SequenceFlow_0v2eeva">
+        <di:waypoint x="983" y="81" />
+        <di:waypoint x="983" y="28" />
+        <di:waypoint x="271" y="28" />
+        <di:waypoint x="271" y="179" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="962" y="55" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0mrww2b_di" bpmnElement="ExclusiveGateway_0mrww2b" isMarkerVisible="true">
+        <dc:Bounds x="958" y="81" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="905.5" y="126" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_09r2m93_di" bpmnElement="EndEvent_09r2m93">
+        <dc:Bounds x="1045" y="88" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1026" y="129" width="73" height="80" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_00ey3rj_di" bpmnElement="SequenceFlow_00ey3rj">
+        <di:waypoint x="1008" y="106" />
+        <di:waypoint x="1045" y="106" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1011" y="85" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0mh0szk_di" bpmnElement="ExclusiveGateway_0mh0szk" isMarkerVisible="true">
+        <dc:Bounds x="3081" y="81" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3110" y="129" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1ko72v2_di" bpmnElement="EndEvent_1ko72v2">
+        <dc:Bounds x="3191" y="88" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3168" y="26" width="82" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_04qxmmw_di" bpmnElement="SequenceFlow_04qxmmw">
+        <di:waypoint x="684" y="106" />
+        <di:waypoint x="876" y="106" />
+        <di:waypoint x="876" y="179" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="723" y="89" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1eq3sh8_di" bpmnElement="SequenceFlow_1eq3sh8">
+        <di:waypoint x="659" y="131" />
+        <di:waypoint x="659" y="179" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="666" y="160" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0kdx56t_di" bpmnElement="SequenceFlow_0kdx56t">
+        <di:waypoint x="926" y="219" />
+        <di:waypoint x="983" y="219" />
+        <di:waypoint x="983" y="131" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_19j4dhs_di" bpmnElement="SequenceFlow_19j4dhs">
+        <di:waypoint x="2618" y="189" />
+        <di:waypoint x="2618" y="106" />
+        <di:waypoint x="2777" y="106" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0fw9acx_di" bpmnElement="SequenceFlow_0fw9acx">
+        <di:waypoint x="2802" y="131" />
+        <di:waypoint x="2802" y="189" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2806" y="135" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0qftsst_di" bpmnElement="SequenceFlow_0qftsst">
+        <di:waypoint x="2827" y="106" />
+        <di:waypoint x="2960" y="106" />
+        <di:waypoint x="2960" y="189" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2882" y="88" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1qq76by_di" bpmnElement="SequenceFlow_1qq76by">
+        <di:waypoint x="3131" y="106" />
+        <di:waypoint x="3191" y="106" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3152" y="88" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1f3zhh4_di" bpmnElement="SequenceFlow_1f3zhh4">
+        <di:waypoint x="3106" y="81" />
+        <di:waypoint x="3106" y="-54" />
+        <di:waypoint x="257" y="-54" />
+        <di:waypoint x="257" y="179" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3086" y="68" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ubcejg_di" bpmnElement="SequenceFlow_0ubcejg">
+        <di:waypoint x="2802" y="269" />
+        <di:waypoint x="2802" y="344" />
+        <di:waypoint x="3263" y="344" />
+        <di:waypoint x="3263" y="106" />
+        <di:waypoint x="3344" y="106" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1ghngp4_di" bpmnElement="Dryrun_Check_Sync">
+        <dc:Bounds x="1104" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0voqjs7_di" bpmnElement="ExclusiveGateway_0voqjs7" isMarkerVisible="true">
+        <dc:Bounds x="1243" y="194" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1211" y="250" width="56" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_19b82s6_di" bpmnElement="SequenceFlow_19b82s6">
+        <di:waypoint x="1204" y="219" />
+        <di:waypoint x="1243" y="219" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0wlpto7_di" bpmnElement="SequenceFlow_0wlpto7">
+        <di:waypoint x="1293" y="219" />
+        <di:waypoint x="1358" y="219" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1288" y="199" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0l8nf74_di" bpmnElement="SequenceFlow_0l8nf74">
+        <di:waypoint x="1268" y="194" />
+        <di:waypoint x="1268" y="106" />
+        <di:waypoint x="1358" y="106" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1294" y="114" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_17ra7mp_di" bpmnElement="SequenceFlow_17ra7mp">
+        <di:waypoint x="1458" y="219" />
+        <di:waypoint x="1514" y="219" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0dv4rn4_di" bpmnElement="ExclusiveGateway_0dv4rn4" isMarkerVisible="true">
+        <dc:Bounds x="1735" y="194" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1702" y="246" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1yc6j0c_di" bpmnElement="SequenceFlow_1yc6j0c">
+        <di:waypoint x="1614" y="219" />
+        <di:waypoint x="1735" y="219" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1glwlg1_di" bpmnElement="SequenceFlow_1glwlg1">
+        <di:waypoint x="1760" y="194" />
+        <di:waypoint x="1760" y="124" />
+        <di:waypoint x="1862" y="124" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1778" y="130" width="36" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1byyqt4_di" bpmnElement="SequenceFlow_1byyqt4">
+        <di:waypoint x="1760" y="244" />
+        <di:waypoint x="1760" y="322" />
+        <di:waypoint x="1862" y="322" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1766" y="302" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1lfw7t3_di" bpmnElement="ExclusiveGateway_1lfw7t3" isMarkerVisible="true">
+        <dc:Bounds x="2021" y="99" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1994" y="142" width="47" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1m9ho0j_di" bpmnElement="SequenceFlow_1m9ho0j">
+        <di:waypoint x="1962" y="124" />
+        <di:waypoint x="2021" y="124" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1g0euep_di" bpmnElement="SequenceFlow_1g0euep">
+        <di:waypoint x="2071" y="124" />
+        <di:waypoint x="2141" y="124" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2070" y="103" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_06lh7wn_di" bpmnElement="ExclusiveGateway_06lh7wn" isMarkerVisible="true">
+        <dc:Bounds x="2021" y="297" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1980" y="354" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0c3ikix_di" bpmnElement="SequenceFlow_0c3ikix">
+        <di:waypoint x="1962" y="322" />
+        <di:waypoint x="2021" y="322" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0fmudsd_di" bpmnElement="SequenceFlow_0fmudsd">
+        <di:waypoint x="2071" y="322" />
+        <di:waypoint x="2141" y="322" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2087" y="331" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0s8jhvl_di" bpmnElement="SequenceFlow_0s8jhvl">
+        <di:waypoint x="2336" y="99" />
+        <di:waypoint x="2336" y="15" />
+        <di:waypoint x="1154" y="15" />
+        <di:waypoint x="1154" y="179" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2315" y="86" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_07a5d0g_di" bpmnElement="SequenceFlow_07a5d0g">
+        <di:waypoint x="2336" y="350" />
+        <di:waypoint x="2336" y="421" />
+        <di:waypoint x="1154" y="421" />
+        <di:waypoint x="1154" y="259" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2316" y="349" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1pr28fs_di" bpmnElement="SequenceFlow_1pr28fs">
+        <di:waypoint x="1268" y="244" />
+        <di:waypoint x="1268" y="482" />
+        <di:waypoint x="2618" y="482" />
+        <di:waypoint x="2618" y="269" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272" y="259" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1yspfps_di" bpmnElement="SequenceFlow_1yspfps">
+        <di:waypoint x="2046" y="149" />
+        <di:waypoint x="2046" y="214" />
+        <di:waypoint x="2568" y="214" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2053" y="156" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0x48vrw_di" bpmnElement="SequenceFlow_0x48vrw">
+        <di:waypoint x="2046" y="297" />
+        <di:waypoint x="2046" y="241" />
+        <di:waypoint x="2568" y="241" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2018" y="268" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0qdd9b4_di" bpmnElement="View_DryrunCheckSync_Errors">
+        <dc:Bounds x="1358" y="66" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1nhokk4_di" bpmnElement="Dryrun_Device_Compare_Config">
+        <dc:Bounds x="1358" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_0tmtjag_di" bpmnElement="View_Compare_Config_Before_Dryrun">
+        <dc:Bounds x="1514" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0ddypja_di" bpmnElement="Sync_To_Before_Dryrun">
+        <dc:Bounds x="1862" y="84" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_06tmu7s_di" bpmnElement="View_SyncTo_Errors_Before_Dryrun">
+        <dc:Bounds x="2141" y="84" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0ha2ubb_di" bpmnElement="Sync_From_Before_Dryrun">
+        <dc:Bounds x="1862" y="282" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1movgvj_di" bpmnElement="View_SyncFrom_Errors_Before_Dryrun">
+        <dc:Bounds x="2141" y="282" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0xk9yn7_di" bpmnElement="ExclusiveGateway_0xk9yn7" isMarkerVisible="true">
+        <dc:Bounds x="1500" y="81" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1488" y="134" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1q2ul0t_di" bpmnElement="SequenceFlow_1q2ul0t">
+        <di:waypoint x="1458" y="106" />
+        <di:waypoint x="1500" y="106" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_090gjk5_di" bpmnElement="EndEvent_090gjk5">
+        <dc:Bounds x="1605" y="88" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1638" y="88" width="90" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_039tzuq_di" bpmnElement="SequenceFlow_039tzuq">
+        <di:waypoint x="1550" y="106" />
+        <di:waypoint x="1605" y="106" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1569" y="88" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1dm8zu2_di" bpmnElement="SequenceFlow_1dm8zu2">
+        <di:waypoint x="1525" y="81" />
+        <di:waypoint x="1525" y="45" />
+        <di:waypoint x="1186" y="45" />
+        <di:waypoint x="1186" y="179" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1345" y="27" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_10idpp1_di" bpmnElement="ExclusiveGateway_10idpp1" isMarkerVisible="true">
+        <dc:Bounds x="2311" y="99" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2300" y="156" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_094pmox_di" bpmnElement="SequenceFlow_094pmox">
+        <di:waypoint x="2241" y="124" />
+        <di:waypoint x="2311" y="124" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0a4dxbf_di" bpmnElement="EndEvent_0a4dxbf">
+        <dc:Bounds x="2431" y="106" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2411" y="149" width="76" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1cw5jr6_di" bpmnElement="SequenceFlow_1cw5jr6">
+        <di:waypoint x="2361" y="124" />
+        <di:waypoint x="2431" y="124" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2387" y="106" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0d7ma5g_di" bpmnElement="ExclusiveGateway_0d7ma5g" isMarkerVisible="true">
+        <dc:Bounds x="2311" y="297" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2300" y="267" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_03bpml4_di" bpmnElement="SequenceFlow_03bpml4">
+        <di:waypoint x="2241" y="322" />
+        <di:waypoint x="2311" y="322" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0j3rvh2_di" bpmnElement="EndEvent_0j3rvh2">
+        <dc:Bounds x="2431" y="304" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2407" y="347" width="84" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_00qnw0y_di" bpmnElement="SequenceFlow_00qnw0y">
+        <di:waypoint x="2361" y="322" />
+        <di:waypoint x="2431" y="322" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2387" y="304" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1qgovpz_di" bpmnElement="EndEvent_1qgovpz">
+        <dc:Bounds x="1862" y="201" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1901" y="204" width="81" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_130rsfb_di" bpmnElement="SequenceFlow_130rsfb">
+        <di:waypoint x="1785" y="219" />
+        <di:waypoint x="1862" y="219" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1808" y="201" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_12n1sb8_di" bpmnElement="SequenceFlow_12n1sb8">
+        <di:waypoint x="3010" y="229" />
+        <di:waypoint x="3106" y="229" />
+        <di:waypoint x="3106" y="131" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0h013ha_di" bpmnElement="SequenceFlow_0h013ha">
+        <di:waypoint x="3693" y="131" />
+        <di:waypoint x="3693" y="545" />
+        <di:waypoint x="273" y="558" />
+        <di:waypoint x="273" y="763" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3693" y="160" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1q9gril_di" bpmnElement="SequenceFlow_1q9gril">
+        <di:waypoint x="3556" y="189" />
+        <di:waypoint x="3556" y="106" />
+        <di:waypoint x="3668" y="106" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0c81m1u_di" bpmnElement="SequenceFlow_0c81m1u">
+        <di:waypoint x="3369" y="81" />
+        <di:waypoint x="3369" y="-141" />
+        <di:waypoint x="224" y="-127" />
+        <di:waypoint x="224" y="179" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3301" y="39" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1v1vatk_di" bpmnElement="SequenceFlow_1v1vatk">
+        <di:waypoint x="1220" y="803" />
+        <di:waypoint x="1266" y="803" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1222" y="785" width="43" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ydd1fd_di" bpmnElement="SequenceFlow_1ydd1fd">
+        <di:waypoint x="1366" y="803" />
+        <di:waypoint x="1414" y="803" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_174yz02_di" bpmnElement="SequenceFlow_174yz02">
+        <di:waypoint x="1514" y="803" />
+        <di:waypoint x="1573" y="803" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0sns07b_di" bpmnElement="SequenceFlow_0sns07b">
+        <di:waypoint x="1623" y="763" />
+        <di:waypoint x="1623" y="686" />
+        <di:waypoint x="1760" y="686" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1j1fhw8_di" bpmnElement="SequenceFlow_1j1fhw8">
+        <di:waypoint x="1785" y="711" />
+        <di:waypoint x="1785" y="763" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1793" y="730" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0utr8xl_di" bpmnElement="SequenceFlow_0utr8xl">
+        <di:waypoint x="1810" y="686" />
+        <di:waypoint x="1935" y="686" />
+        <di:waypoint x="1935" y="763" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1864" y="668" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_13z83pz_di" bpmnElement="Post_Check_Before_Rollback">
+        <dc:Bounds x="1885" y="763" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0dhzep6_di" bpmnElement="SequenceFlow_0dhzep6">
+        <di:waypoint x="1985" y="803" />
+        <di:waypoint x="2046" y="803" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0j5wm1o_di" bpmnElement="SequenceFlow_0j5wm1o">
+        <di:waypoint x="2146" y="803" />
+        <di:waypoint x="2202" y="803" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_13bv9s9_di" bpmnElement="SequenceFlow_13bv9s9">
+        <di:waypoint x="2302" y="803" />
+        <di:waypoint x="2369" y="803" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_19gzlcx_di" bpmnElement="ExclusiveGateway_19gzlcx" isMarkerVisible="true">
+        <dc:Bounds x="479" y="918" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ss5yzm_di" bpmnElement="SequenceFlow_1ss5yzm">
+        <di:waypoint x="504" y="843" />
+        <di:waypoint x="504" y="918" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0fhr3hg_di" bpmnElement="EndEvent_0fhr3hg">
+        <dc:Bounds x="579" y="925" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="555" y="968" width="85" height="66" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0aut0ct_di" bpmnElement="SequenceFlow_0aut0ct">
+        <di:waypoint x="529" y="943" />
+        <di:waypoint x="579" y="943" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="538" y="925" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1e9bdwf_di" bpmnElement="SequenceFlow_1e9bdwf">
+        <di:waypoint x="479" y="943" />
+        <di:waypoint x="210" y="943" />
+        <di:waypoint x="210" y="259" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="420" y="951" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1g1fhfm_di" bpmnElement="ExclusiveGateway_1g1fhfm" isMarkerVisible="true">
+        <dc:Bounds x="1760" y="918" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0eazq76_di" bpmnElement="SequenceFlow_0eazq76">
+        <di:waypoint x="1785" y="843" />
+        <di:waypoint x="1785" y="918" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1tsgl5f_di" bpmnElement="EndEvent_1tsgl5f">
+        <dc:Bounds x="1860" y="925" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1835" y="968" width="87" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_05l258y_di" bpmnElement="SequenceFlow_05l258y">
+        <di:waypoint x="1810" y="943" />
+        <di:waypoint x="1860" y="943" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1819" y="925" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_01z11ma_di" bpmnElement="SequenceFlow_01z11ma">
+        <di:waypoint x="1760" y="943" />
+        <di:waypoint x="1623" y="943" />
+        <di:waypoint x="1623" y="843" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1716" y="926" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0u4ewh9_di" bpmnElement="SequenceFlow_0u4ewh9">
+        <di:waypoint x="294" y="219" />
+        <di:waypoint x="383" y="219" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

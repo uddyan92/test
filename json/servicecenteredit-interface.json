@@ -1,0 +1,15 @@
+{
+ "name": "test",
+ "elements": [
+                 {
+                 "type": "dropdown",
+                 "name": "Select",
+                 "Info": "d0"
+                 },
+                 {
+                 "type": "text",
+                 "name": "dummy",
+                 "Info": "1.2.1.2"
+                 }
+             ]
+}

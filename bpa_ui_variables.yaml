@@ -1,0 +1,388 @@
+
+#URL containing Selenium server address and port
+REMOTE_URL: 'http://selenium:4444/wd/hub'
+
+#Login page information
+login:
+    bpa_url: 'https://10.52.123.82/portal/#/login'
+    bpa_username : 'admin'
+    bpa_password: 'admin'
+
+#workflow for excution
+osupgrade:
+    device_name: 'ASR920'
+    create_new:
+          Select Platform Model: 'ASR-920-24TZ-M'
+          Select Device Role: 'UPE92'
+          Select Release Software Version: '3.18.5SP'
+          File Transfer Protocol: 'FTP'
+          mdt_number: 123
+          Approval Status: 'Approved'
+          mutilselect_device: 'STC-ASR920-1'
+    
+    reset_platform_model:
+          Select Platform Model: 'ASR-920-24SZ-M'
+    
+    mdt_params:
+          mdt_number: 123
+          Approval Status: 'Approved'
+          mutilselect_device: 'STC-ASR920-2'
+    create_new_later:
+          Select Platform Model: 'ASR-920-24TZ-M'
+          Select Device Role: 'UPE92'
+          Select Release Software Version: '3.18.5SP'
+          File Transfer Protocol: 'FTP'
+          mdt_number: 123
+          Approval Status: 'Approved'
+          mutilselect_device: 'STC-ASR920-1'
+          date_value: '11/8/2019'
+          time_value: '12:30'
+              
+workflow:
+    execute:
+        name: 'NSO Service Provisioning Sample WF'
+        version: 16
+        key: 'serviceprovisioning'
+        jsonpayload: 'json/NSO_workflow.json'
+    delete:
+        single:
+            name: 'Process to change interface switchport description'
+            version:
+                - 1
+            key: 'IOS_SwitchPort'
+        all_versions:
+            name: 'delete_all_ver'
+        multiple_versions:
+            name: 'Process to change interface switchport description'
+            version:
+                - 108
+                - 109
+    download:
+        name: 'download_workflow'
+        version: 1
+        key: 'testing'
+
+    unclaim_task:
+        task_instance_id: 'de3e5cd8-aec5-11e9-abbe-0242ac15000c'
+
+    download_csv:
+        activity: 'CSV'
+        workflows:
+            name:
+                - 'download_workflow'
+                - 'download_multiple'
+            version:
+                - 1
+                - 1
+            key:
+                - 'testing'
+                - 'multiple'
+
+    download_excel:
+        activity: 'Excel'
+        workflows:
+            name:
+                - 'download_workflow'
+                - 'download_multiple'
+            version:
+                - 1
+                - 1
+            key:
+                - 'testing'
+                - 'multiple'
+
+    upload:
+        filepath :
+             -  'json/ios_switch_port.bpmn'
+    edit:
+        name: 'Edit_workflow'
+        version: 1
+        key: 'edit'
+        file_path: 'json/editworkflow.json'
+
+    import_as_draft:
+        filepath: 'json/ios_switch_port.bpmn'
+
+    create:
+        name: 'create_workflow'
+        key: 'cisco'
+        filepath: 'json/create_workflow.json'
+#Formbuilder
+
+formbuilder:
+    Import:
+        name : "Add_Form"
+        filepath: "json/Add_Form.json"
+
+    edit:
+        name : "Add_Form"
+        edit_json_file_name: "json/Editform.json"
+        nso: 'NSO-1'
+        service: ' /bpa-service:bpa-service'
+    Delete:
+        name: 'Add_Form'
+
+    Multiform_delete:
+        formname_list :
+                   - 'cisco1'
+                   - 'cisco2'
+
+
+#Device details for device manager
+deviceManager:
+    nso: 'NSO-1'
+    view:
+        name: 'testing_abc'
+    edit:
+        Name: 'testing_abc'
+        Address: '11.11.11.11'
+        Port: '123'
+        Description: 'new configuration'
+        Latitude: '1'
+        Longitude: '1'
+        Select Auth Group: 'default'
+        Select Device-Type: 'cli'
+        Protocol: 'ssh'
+        Ned Id: 'cisco-ios'
+        Admin State: 'unlocked'
+    add:
+        Name: 'testing_abc'
+        Address: '11.12.11.12'
+        Port: '12324'
+        Description: 'configuration'
+        Latitude: '1'
+        Longitude: '1'
+        Select Auth Group: 'default'
+        Select Device-Type: 'cli'
+        Protocol: 'ssh'
+        Ned Id: 'cisco-ios'
+        Admin State: 'unlocked'
+
+    delete:
+        name: 'testing_abc'
+
+
+#Service details for Service Center
+ServiceCenter:
+    NSO: 'NSO-1'
+    ServiceList: 'bpa-service:bpa-service'
+    Edit:
+       Name: 'add_device'
+       Device : 'test'
+       Dummy_IP: '192.168.2.5'
+       Edit_Json_file_Name: "json/servicecenteredit.json"
+    Add:
+       Name: 'add_device'
+    Upload:
+       Name: 'Upload_instance_Sample'
+       Json_file_path : 'json/upload-service-interface.json'
+    Download:
+       CSVFile: 'export.csv'
+       EXCELFile: 'export.xlsx'
+       JSONFile: 'Service Instances.json'
+       service_name:
+           - 'device_down_1'
+           - 'device_down_2'
+    Delete:
+       Name: 'add_device'
+    View:
+       Name: 'service_view'
+    DeleteAll:
+       Services:
+           - 'delete_one'
+           - 'delete_two'
+
+#PROCESS TEMPLATE
+ProcessTemplate:
+    process_template:
+        Add:
+            process:
+                Name: "Addtemplate"
+                Description: "AddDescription"
+                Pass Criteria: "1"
+                Select NSO: "NSO"
+                Select NED: "cisco-ios"
+                Select Device: "device2"
+            command: 'show version'
+
+        Edit:
+            activity: 'Edit'
+            multiple:
+                - 'Addtemplate'
+            process:
+                Name: "Edittempname"
+                Description: "EditDescription"
+                Pass Criteria: "1"
+                Select NSO: "NSO"
+                Select NED: "cisco-ios"
+                Select Device: "device2"
+            command: 'show version'
+
+        Upload_process_template:
+            File_path: 'json/processtemplate.json'
+
+        Download_multiple_process_template:
+            activity: 'Download'
+            multiple:
+                - 'download_multiple_one'
+                - 'download_multiple_two'
+        Download_single_process_template:
+            activity: 'Download'
+            multiple:
+                    - 'download_single'
+        Delete_multiple_process_template:
+            activity: 'Delete'
+            multiple:
+                    - 'delete_multiple_1'
+                    - 'delete_multiple_2'
+        Download_multiple_process_template_CSV:
+            activity: 'CSV'
+            multiple:
+                - 'download_multiple_one'
+                - 'download_multiple_two'
+        Download_multiple_process_template_Excel:
+            activity: 'Excel'
+            multiple:
+                - 'download_multiple_one'
+                - 'download_multiple_two'
+        Single_delete_using_icon:
+            activity: 'Delete'
+            multiple:
+                - 'delete_single'
+
+    Search_name_date:
+        name: 'search_name'
+        from_date: '01/01/19'
+        to_date: '04/11/19'
+
+    Search_name:
+        name: 'search_name'
+
+    Search_date:
+        from_date: '01/01/19'
+        to_date: '04/11/19'
+
+    Scripts:
+        Add:
+            template:
+                Type *: 'Analysis Script'
+                command: 'hostname'
+                upload:
+                    Json_file_path: 'json/processtemplate.json'
+        Upload:
+            File_path: 'json/Archive.zip'
+
+        Download_multiple_scripts:
+            activity: 'Download'
+            multiple:
+                - 'cisco_generic_analysis.py'
+                - 'cisco_ios_multi_command_analysis.py'
+
+        Delete_multiple_scripts:
+            activity: 'Delete'
+            multiple:
+                - 'cisco_ios_show_vlan.template'
+                - 'cisco_ios_show_vtp_status.template'
+
+        Download_multiple_scripts_CSV:
+            activity: 'CSV'
+            multiple:
+                - 'cisco_generic_analysis.py'
+                - 'cisco_ios_multi_command_analysis.py'
+
+        Download_multiple_scripts_Excel:
+            activity: 'Excel'
+            multiple:
+                - 'cisco_generic_analysis.py'
+                - 'cisco_ios_multi_command_analysis.py'
+
+        Single_delete:
+            activity: 'Delete'
+            multiple:
+                - 'hostname_analysis.py'
+
+        Single_download:
+            activity: 'Download'
+            multiple:
+                - 'cisco_generic_analysis.py'
+        Single_view:
+            activity: 'View'
+            multiple:
+                - 'cisco_generic_analysis.py'
+
+        Single_edit:
+            activity: 'Edit'
+            multiple:
+                - 'cisco_ios_prepost_show_version_analysis.py'
+
+            template:
+                Type *: 'TextFSM Template'
+                command: 'Editscript'
+                upload:
+                    Json_file_path: 'json/processtemplate.json'
+    Analytics:
+        Add:
+            process:
+                ID: 'MainTemplate'
+                Choose First Template: 'analytics_tab_1'
+                Choose Second Template: 'analytics_tab_2'
+
+        Delete:
+            activity: 'Delete'
+            multiple:
+                - 'EditTemplate'
+
+        Edit:
+            activity: 'Edit'
+            multiple:
+                - 'MainTemplate'
+            process:
+                ID: 'SuperTemplate'
+                Choose First Template: 'analytics_tab_1'
+                Choose Second Template: 'analytics_tab_2'
+
+        Download_multiple_CSV:
+            activity: 'CSV'
+            multiple:
+                - 'download_test_1'
+                - 'download_test_2'
+
+        Download_multiple_Excel:
+            activity: 'Excel'
+            multiple:
+                - 'download_test_1'
+                - 'download_test_2'
+
+    Executions:
+        Download_multiple_CSV:
+            activity: 'CSV'
+            multiple:
+                - '5d271b078f215027e3f105b8'
+                - '5d271aaa8f215027e3f105b6'
+
+        Download_multiple_Excel:
+            activity: 'Excel'
+            multiple:
+                - '5d271b078f215027e3f105b8'
+                - '5d271aaa8f215027e3f105b6'
+
+        Download_single_Excel:
+            activity: 'Excel'
+            multiple:
+                - '5d271b078f215027e3f105b8'
+
+        Download_single_CSV:
+            activity: 'CSV'
+            multiple:
+                - '5d271b078f215027e3f105b8'
+
+        Download_All_CSV:
+            activity: 'CSV'
+
+        Download_All_Excel:
+            activity: 'Excel'
+        View:
+            activity: 'View detail'
+            multiple:
+                - '5d271b078f215027e3f105b8'
+

@@ -1,0 +1,27 @@
+
+{
+ "name": "Edit_workflow",
+ "elements": [
+                 {
+                 "type":"text",
+                 "name": "versionTag",
+                 "val": "3"
+                 },
+                 {
+                 "type":"text",
+                 "name": "taskPriority",
+                 "val": "1"
+                 },
+                 {
+                 "type":"text",
+                 "name": "jobPriority",
+                 "val": "2"
+                 },
+                 {
+                 "type":"text",
+                 "name": "historyTimeToLive",
+                 "val": "3"
+                 }
+
+             ]
+}

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 3.1.2 (Python 3.6.6 on linux)" generated="20200106 06:35:12.259" rpa="false">
+<suite id="s1" name="4.6.12 UI" source="/home/cisco/cxta-bpa/examples/4.6.12_UI.robot">
+<test id="s1-t1" name="4.6.2 JOB LISTING PAGE TEST">
+<kw name="Testcase setup" type="setup">
+<kw name="Start Browser" library="CXTA.robot.Browser">
+<doc>Browser.start_browser(self, browser_name=u'firefox', download_path=None, screenshot_path=None, remote_url=None, flash=False, proxy_urls=None)</doc>
+<arguments>
+<arg>browser_name=chrome</arg>
+<arg>remote_url=${REMOTE_URL}</arg>
+</arguments>
+<status status="PASS" starttime="20200106 06:35:22.659" endtime="20200106 06:35:23.896"></status>
+</kw>
+<kw name="Login to BPA UI &quot;${login.bpa_url}&quot; with credentials &quot;${login.bpa_username}&quot; and &quot;${login.bpa_password}&quot;" library="bpa_ui">
+<doc>Login for BPA UI Application:</doc>
+<kw name="set browser timeout to &quot;${BPA__MAX_WAIT_TIME}&quot; seconds" library="CXTA.robot.Browser">
+<doc>Browser.set_browser_timeout(self, timeout)</doc>
+<status status="PASS" starttime="20200106 06:35:23.913" endtime="20200106 06:35:23.915"></status>
+</kw>
+<kw name="clear the browser cookies" library="CXTA.robot.Browser">
+<doc>Browser.clear_browser_cookies(self)</doc>
+<status status="PASS" starttime="20200106 06:35:23.921" endtime="20200106 06:35:23.991"></status>
+</kw>
+<kw name="visit &quot;${url}&quot;" library="CXTA.robot.Browser">
+<doc>Browser.visit_site(self, url)</doc>
+<msg timestamp="20200106 06:35:23.999" level="INFO">Visiting url "https://10.52.123.82/portal/#/login"</msg>
+<status status="PASS" starttime="20200106 06:35:23.997" endtime="20200106 06:36:23.483"></status>
+</kw>
+<kw name="wait until object is clickable via XPath &quot;${BPA__TXT_UID_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>ElementsAttributes.wait_for_clickable_object_via_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:36:23.486" endtime="20200106 06:36:24.155"></status>
+</kw>
+<kw name="enter &quot;${username}&quot; in the field with XPath &quot;${BPA__TXT_UID_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>Inputs.enter_text_in_the_field_with_xpath(self, text, xpath)</doc>
+<status status="PASS" starttime="20200106 06:36:24.160" endtime="20200106 06:36:24.360"></status>
+</kw>
+<kw name="wait until object is clickable via XPath &quot;${BPA__TXT_PWD_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>ElementsAttributes.wait_for_clickable_object_via_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:36:24.362" endtime="20200106 06:36:24.451"></status>
+</kw>
+<kw name="enter &quot;${password}&quot; in the field with XPath &quot;${BPA__TXT_PWD_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>Inputs.enter_text_in_the_field_with_xpath(self, text, xpath)</doc>
+<status status="PASS" starttime="20200106 06:36:24.454" endtime="20200106 06:36:24.807"></status>
+</kw>
+<kw name="wait until object is clickable via XPath &quot;${BPA__BTN_LOGIN_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>ElementsAttributes.wait_for_clickable_object_via_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:36:24.821" endtime="20200106 06:36:24.943"></status>
+</kw>
+<kw name="click on the object with XPath &quot;${BPA__BTN_LOGIN_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>MouseEvents.click_object_with_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:36:24.946" endtime="20200106 06:36:25.086"></status>
+</kw>
+<kw name="wait until object is clickable via XPath &quot;${BPA__LBL_DASHBOARD_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>ElementsAttributes.wait_for_clickable_object_via_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:36:25.089" endtime="20200106 06:36:33.478"></status>
+</kw>
+<status status="PASS" starttime="20200106 06:35:23.904" endtime="20200106 06:36:33.480"></status>
+</kw>
+<status status="PASS" starttime="20200106 06:35:22.654" endtime="20200106 06:36:33.480"></status>
+</kw>
+<kw name="set browser timeout to &quot;${BPA__MAX_WAIT_TIME}&quot; seconds" library="CXTA.robot.Browser">
+<doc>Browser.set_browser_timeout(self, timeout)</doc>
+<status status="PASS" starttime="20200106 06:36:33.484" endtime="20200106 06:36:33.486"></status>
+</kw>
+<kw name="Wait for the loading icon to disappear" library="CxtaBPA.CxtaBPAUI">
+<doc>Method to wait for loading icon to disappear</doc>
+<status status="PASS" starttime="20200106 06:36:33.491" endtime="20200106 06:36:49.728"></status>
+</kw>
+<kw name="click on the object with XPath &quot;${BPA_OS_UPGRADE_TILE_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>MouseEvents.click_object_with_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:36:49.731" endtime="20200106 06:36:50.487"></status>
+</kw>
+<kw name="wait until object is clickable via XPath &quot;${BPA_SELECT_DEVICE_LBL_TILE}&quot;" library="CXTA.robot.Browser">
+<doc>ElementsAttributes.wait_for_clickable_object_via_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:36:50.492" endtime="20200106 06:36:52.660"></status>
+</kw>
+<kw name="Wait for the loading icon to disappear" library="CxtaBPA.CxtaBPAUI">
+<doc>Method to wait for loading icon to disappear</doc>
+<status status="PASS" starttime="20200106 06:36:52.667" endtime="20200106 06:36:59.549"></status>
+</kw>
+<kw name="STC upgrade select device &quot;${osupgrade.device_name}&quot;" library="CxtaBPA.CxtaBPAUI">
+<doc>This keyword retrieves list of devices in the selected BOA environment in STC.</doc>
+<status status="PASS" starttime="20200106 06:36:59.553" endtime="20200106 06:36:59.981"></status>
+</kw>
+<kw name="Wait for the loading icon to disappear" library="CxtaBPA.CxtaBPAUI">
+<doc>Method to wait for loading icon to disappear</doc>
+<status status="PASS" starttime="20200106 06:36:59.984" endtime="20200106 06:37:00.778"></status>
+</kw>
+<kw name="wait until object is clickable via XPath &quot;${BPA__SELECT_CREATE_NEW_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>ElementsAttributes.wait_for_clickable_object_via_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:37:00.784" endtime="20200106 06:37:00.986"></status>
+</kw>
+<kw name="Wait for the loading icon to disappear" library="CxtaBPA.CxtaBPAUI">
+<doc>Method to wait for loading icon to disappear</doc>
+<status status="PASS" starttime="20200106 06:37:00.989" endtime="20200106 06:37:07.287"></status>
+</kw>
+<kw name="click on the object with XPath &quot;${BPA__SELECT_CREATE_NEW_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>MouseEvents.click_object_with_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:37:07.295" endtime="20200106 06:37:07.531"></status>
+</kw>
+<kw name="Wait for the loading icon to disappear" library="CxtaBPA.CxtaBPAUI">
+<doc>Method to wait for loading icon to disappear</doc>
+<status status="PASS" starttime="20200106 06:37:07.534" endtime="20200106 06:37:08.725"></status>
+</kw>
+<kw name="Create device values with active os upgrade status mdt rows &quot;${osupgrade.create_new}&quot;" library="CxtaBPA.CxtaBPAUI">
+<doc>This keyword retrieves list of devices in the selected BOA environment in STC.</doc>
+<status status="PASS" starttime="20200106 06:37:08.729" endtime="20200106 06:37:19.669"></status>
+</kw>
+<kw name="Wait for the loading icon to disappear" library="CxtaBPA.CxtaBPAUI">
+<doc>Method to wait for loading icon to disappear</doc>
+<status status="PASS" starttime="20200106 06:37:19.674" endtime="20200106 06:37:27.943"></status>
+</kw>
+<kw name="wait until object is clickable via XPath &quot;${BPA__SELECT_MDT_ROWS}&quot;" library="CXTA.robot.Browser">
+<doc>ElementsAttributes.wait_for_clickable_object_via_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:37:27.949" endtime="20200106 06:37:28.024"></status>
+</kw>
+<kw name="click on the object with XPath &quot;${BPA__SELECT_MDT_ROWS}&quot;" library="CXTA.robot.Browser">
+<doc>MouseEvents.click_object_with_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:37:28.027" endtime="20200106 06:37:28.223"></status>
+</kw>
+<kw name="Testcase teardown" type="teardown">
+<kw name="Logout of BPA UI" library="bpa_ui">
+<doc>Logs out of BPA UI</doc>
+<kw name="set browser timeout to &quot;${BPA__MAX_WAIT_TIME}&quot; seconds" library="CXTA.robot.Browser">
+<doc>Browser.set_browser_timeout(self, timeout)</doc>
+<status status="PASS" starttime="20200106 06:37:28.231" endtime="20200106 06:37:28.233"></status>
+</kw>
+<kw name="Wait for the loading icon to disappear" library="CxtaBPA.CxtaBPAUI">
+<doc>Method to wait for loading icon to disappear</doc>
+<status status="PASS" starttime="20200106 06:37:28.236" endtime="20200106 06:37:34.803"></status>
+</kw>
+<kw name="wait until object is clickable via XPath &quot;${BPA__MENU_PROFILE_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>ElementsAttributes.wait_for_clickable_object_via_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:37:34.805" endtime="20200106 06:37:34.890"></status>
+</kw>
+<kw name="click on the object with XPath &quot;${BPA__MENU_PROFILE_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>MouseEvents.click_object_with_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:37:34.892" endtime="20200106 06:37:35.038"></status>
+</kw>
+<kw name="wait until object is clickable via XPath &quot;${BPA__MENU_LOGOUT_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>ElementsAttributes.wait_for_clickable_object_via_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:37:35.042" endtime="20200106 06:37:35.682"></status>
+</kw>
+<kw name="click on the object with XPath &quot;${BPA__MENU_LOGOUT_XPATH}&quot;" library="CXTA.robot.Browser">
+<doc>MouseEvents.click_object_with_xpath(self, xpath)</doc>
+<status status="PASS" starttime="20200106 06:37:35.685" endtime="20200106 06:37:35.881"></status>
+</kw>
+<status status="PASS" starttime="20200106 06:37:28.226" endtime="20200106 06:37:35.881"></status>
+</kw>
+<kw name="close browser" library="CXTA.robot.Browser">
+<doc>Browser.close_browser(self)</doc>
+<status status="PASS" starttime="20200106 06:37:35.885" endtime="20200106 06:37:35.943"></status>
+</kw>
+<status status="PASS" starttime="20200106 06:37:28.224" endtime="20200106 06:37:35.944"></status>
+</kw>
+<status status="PASS" starttime="20200106 06:35:22.651" endtime="20200106 06:37:35.946" critical="yes"></status>
+</test>
+<status status="PASS" starttime="20200106 06:35:12.261" endtime="20200106 06:37:35.948"></status>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0">Critical Tests</stat>
+<stat pass="1" fail="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="1" fail="0" id="s1" name="4.6.12 UI">4.6.12 UI</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
